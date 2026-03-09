@@ -12,22 +12,18 @@ from homeassistant.helpers import area_registry as ar, entity_registry as er
 
 from .const import (
     API_ENTITIES_PATH,
-    API_PROCESS_PATH,
-    CONF_LLM_SOURCE,
-    DOMAIN,
-    JSON_SCHEMA_HINT,
-    LLM_SOURCE_HA_OPENAI,
-    OPENAI_INTEGRATION_DOMAIN,
     API_OPTIONS_PATH,
-    CONF_API_KEY,
-    CONF_BASE_URL,
+    API_PROCESS_PATH,
+    API_STATUS_PATH,
+    CONF_LLM_SOURCE,
     CONF_MODEL,
     CONF_PROVIDER,
-    DEFAULT_BASE_URL,
     DEFAULT_MODEL,
     DEFAULT_PROVIDER,
     DOMAIN,
     JSON_SCHEMA_HINT,
+    LLM_SOURCE_HA_OPENAI,
+    OPENAI_INTEGRATION_DOMAIN,
     PROVIDER_MODELS,
 )
 
@@ -35,19 +31,21 @@ PROCESS_SCHEMA = vol.Schema({vol.Required("text"): str})
 OPTIONS_SCHEMA = vol.Schema({vol.Required(CONF_MODEL): str})
 
 
-def _active_config(hass: HomeAssistant) -> dict[str, Any]:
-    entry = _primary_entry(hass)
-    config = {**entry.data, **entry.options}
-    return {
-        CONF_LLM_SOURCE: config.get(CONF_LLM_SOURCE, LLM_SOURCE_HA_OPENAI),
-    }
-
-
 def _primary_entry(hass: HomeAssistant):
     entries = list(hass.config_entries.async_entries(DOMAIN))
     if not entries:
         raise ValueError("No Light Companion configuration found")
     return entries[0]
+
+
+def _active_config(hass: HomeAssistant) -> dict[str, Any]:
+    entry = _primary_entry(hass)
+    config = {**entry.data, **entry.options}
+    return {
+        CONF_LLM_SOURCE: config.get(CONF_LLM_SOURCE, LLM_SOURCE_HA_OPENAI),
+        CONF_PROVIDER: config.get(CONF_PROVIDER, DEFAULT_PROVIDER),
+        CONF_MODEL: config.get(CONF_MODEL, DEFAULT_MODEL),
+    }
 
 
 def _serialize_light_entity(
@@ -119,9 +117,13 @@ async def _call_provider(hass: HomeAssistant, config: dict[str, Any], prompt: st
 
 def _parse_actions(raw: str) -> dict[str, Any]:
     parsed = json.loads(raw)
+    if not isinstance(parsed, dict):
+        raise ValueError("LLM response must be a JSON object")
+
     actions = parsed.get("actions", [])
     if not isinstance(actions, list):
         raise ValueError("actions must be a list")
+
     return parsed
 
 
@@ -172,11 +174,6 @@ class LightCompanionOptionsView(HomeAssistantView):
 
     url = API_OPTIONS_PATH
     name = "api:lightcompanion:options"
-class LightCompanionStatusView(HomeAssistantView):
-    """Return frontend readiness information."""
-
-    url = API_STATUS_PATH
-    name = "api:lightcompanion:status"
     requires_auth = True
 
     async def get(self, request):
@@ -208,6 +205,17 @@ class LightCompanionStatusView(HomeAssistantView):
                 "available_models": PROVIDER_MODELS.get(provider, []),
             }
         )
+
+
+class LightCompanionStatusView(HomeAssistantView):
+    """Return frontend readiness information."""
+
+    url = API_STATUS_PATH
+    name = "api:lightcompanion:status"
+    requires_auth = True
+
+    async def get(self, request):
+        hass: HomeAssistant = request.app["hass"]
         available_domains = {entry.domain for entry in hass.config_entries.async_entries()}
         has_openai_integration = bool(
             {"openai_conversation", "openai"}.intersection(available_domains)
@@ -224,8 +232,7 @@ class LightCompanionProcessView(HomeAssistantView):
 
     async def post(self, request):
         hass: HomeAssistant = request.app["hass"]
-        body = await request.json()
-        body = PROCESS_SCHEMA(body)
+        body = PROCESS_SCHEMA(await request.json())
 
         entity_reg = er.async_get(hass)
         area_reg = ar.async_get(hass)
@@ -237,7 +244,20 @@ class LightCompanionProcessView(HomeAssistantView):
 
         prompt = _build_prompt(body["text"], entities)
         raw = await _call_provider(hass, config, prompt)
-        parsed = _parse_actions(raw)
+
+        try:
+            parsed = _parse_actions(raw)
+        except (json.JSONDecodeError, ValueError) as err:
+            return self.json(
+                {
+                    "summary": "LLM response was invalid JSON. No actions executed.",
+                    "llm_raw": raw,
+                    "results": [],
+                    "error": str(err),
+                },
+                status_code=400,
+            )
+
         results = await _execute_actions(hass, parsed.get("actions", []))
 
         return self.json(
