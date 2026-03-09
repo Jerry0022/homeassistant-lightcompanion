@@ -9,5 +9,9 @@
     "abort": {
       "missing_openai": "No configured Home Assistant OpenAI integration was found. Set up the OpenAI Conversation integration first (Settings > Devices & Services > Add Integration > OpenAI Conversation), then retry Light Companion."
     }
+  },
+  "panel": {
+    "openai_missing": "OpenAI integration is missing.",
+    "open_integrations_cta": "Open Integrations"
   }
 }

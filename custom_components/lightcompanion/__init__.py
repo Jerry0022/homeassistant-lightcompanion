@@ -38,6 +38,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not domain_data.get("views_registered"):
         hass.http.register_view(LightCompanionProcessView)
         hass.http.register_view(LightCompanionEntitiesView)
+        hass.http.register_view(LightCompanionOptionsView)
         domain_data["views_registered"] = True
 
     await async_register_panel(hass)
