@@ -6,7 +6,12 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
-from .api import LightCompanionEntitiesView, LightCompanionProcessView
+from .api import (
+    LightCompanionEntitiesView,
+    LightCompanionOptionsView,
+    LightCompanionProcessView,
+    LightCompanionStatusView,
+)
 from .const import (
     CONF_LLM_SOURCE,
     DOMAIN,
@@ -39,6 +44,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.http.register_view(LightCompanionProcessView)
         hass.http.register_view(LightCompanionEntitiesView)
         hass.http.register_view(LightCompanionOptionsView)
+        hass.http.register_view(LightCompanionStatusView)
         domain_data["views_registered"] = True
 
     await async_register_panel(hass)
