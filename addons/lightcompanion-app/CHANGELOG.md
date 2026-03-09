@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.5
+
+- Bump integration and add-on version metadata so Home Assistant can detect a newer update.
+
 ## 0.2.4
 - Remove binary icon assets (`icon.png`/`logo.png`) because binary files are not supported in this delivery workflow.
 - Keep `panel_icon` (`mdi:head-lightbulb`) for Home Assistant sidebar visibility without binary assets.
