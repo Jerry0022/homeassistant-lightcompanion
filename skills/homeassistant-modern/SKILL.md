@@ -16,6 +16,10 @@ Use this skill when implementing or updating Home Assistant custom integrations 
 5. Ensure HACS-friendly repository structure.
 6. Keep documentation and guidance text in English by default.
 7. Keep localization files translatable, but ensure fallback/source strings are English.
+8. Apply semantic versioning on every code change:
+   - At minimum, bump the patch version (last number) for any change.
+   - For functional extensions (new functionality, not bug fixes or improvements), bump the minor version (middle number).
+   - Bump the major version (first number) only when explicitly requested by the repository owner/user.
 
 ## Checklist
 - [ ] `manifest.json` contains integration metadata and dependencies.
@@ -24,3 +28,4 @@ Use this skill when implementing or updating Home Assistant custom integrations 
 - [ ] Frontend sends command text and shows action log/status.
 - [ ] Backend exposes secure API endpoints under `/api/...` and uses HA auth.
 - [ ] README explains install via custom repository and usage flow.
+- [ ] Version was bumped according to semver policy (patch for any change, minor for new functionality, major only on explicit request).

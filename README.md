@@ -20,6 +20,18 @@ Required provider settings:
 - `model`
 - `base_url`
 
+
+## Updating
+### Custom integration (HACS)
+1. Open HACS → **Integrations** → **Light Companion**.
+2. Click **Update** when a newer version is available.
+3. Restart Home Assistant after update.
+
+### Add-on repository
+1. Open **Settings → Add-ons → Add-on Store**.
+2. Refresh repositories (3-dot menu → **Check for updates**).
+3. Open **Light Companion App** and install/update to the newest version.
+
 ## Usage
 - Open the **Light Companion** sidebar panel.
 - Enter a command such as “Set living room lights to warm white at 40%”.

@@ -37,7 +37,7 @@ class AddonOptions:
 
 
 class LightCompanionHandler(BaseHTTPRequestHandler):
-    server_version = "LightCompanionApp/0.2"
+    server_version = "LightCompanionApp/0.2.2"
 
     def _write_json(self, payload: dict[str, Any], status: HTTPStatus = HTTPStatus.OK) -> None:
         body = json.dumps(payload).encode("utf-8")
