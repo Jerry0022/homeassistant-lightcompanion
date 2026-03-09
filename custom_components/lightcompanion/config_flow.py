@@ -11,14 +11,10 @@ import voluptuous as vol
 from homeassistant import config_entries
 
 from .const import (
-    CONF_API_KEY,
-    CONF_BASE_URL,
-    CONF_MODEL,
-    CONF_PROVIDER,
-    DEFAULT_BASE_URL,
-    DEFAULT_MODEL,
-    DEFAULT_PROVIDER,
+    CONF_LLM_SOURCE,
     DOMAIN,
+    LLM_SOURCE_HA_OPENAI,
+    OPENAI_INTEGRATION_DOMAIN,
     PROVIDER_MODELS,
 )
 
@@ -41,13 +37,15 @@ class LightCompanionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
         """Handle first step."""
-        errors: dict[str, str] = {}
+        await self.async_set_unique_id(DOMAIN)
+        self._abort_if_unique_id_configured()
 
-        if user_input is not None:
-            await self.async_set_unique_id(DOMAIN)
-            self._abort_if_unique_id_configured()
-            return self.async_create_entry(title="Light Companion", data=user_input)
+        if not self.hass.config_entries.async_entries(OPENAI_INTEGRATION_DOMAIN):
+            return self.async_abort(reason="missing_openai")
 
+        return self.async_create_entry(
+            title="Light Companion",
+            data={CONF_LLM_SOURCE: LLM_SOURCE_HA_OPENAI},
         provider = (user_input or {}).get(CONF_PROVIDER, DEFAULT_PROVIDER)
         schema = vol.Schema(
             {
@@ -62,7 +60,6 @@ class LightCompanionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_BASE_URL, default=DEFAULT_BASE_URL): str,
             }
         )
-        return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
 
     @staticmethod
     def async_get_options_flow(config_entry):
@@ -76,6 +73,8 @@ class LightCompanionOptionsFlow(config_entries.OptionsFlow):
         self.config_entry = config_entry
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
+        """No options currently exposed."""
+        return self.async_create_entry(title="", data={})
         """Manage options."""
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)

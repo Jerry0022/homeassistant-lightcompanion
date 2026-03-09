@@ -9,10 +9,14 @@ CONF_PROVIDER = "provider"
 CONF_API_KEY = "api_key"
 CONF_MODEL = "model"
 CONF_BASE_URL = "base_url"
+CONF_LLM_SOURCE = "llm_source"
 
 DEFAULT_PROVIDER = "openai"
 DEFAULT_MODEL = "gpt-4o-mini"
 DEFAULT_BASE_URL = "https://api.openai.com/v1"
+
+LLM_SOURCE_HA_OPENAI = "ha_openai"
+OPENAI_INTEGRATION_DOMAIN = "openai_conversation"
 
 PANEL_URL_PATH = "lightcompanion"
 PANEL_TITLE = "Light Companion"
