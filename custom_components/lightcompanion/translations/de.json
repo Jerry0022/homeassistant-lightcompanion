@@ -12,5 +12,9 @@
         }
       }
     }
+  },
+  "panel": {
+    "openai_missing": "OpenAI-Integration fehlt.",
+    "open_integrations_cta": "Integrationen öffnen"
   }
 }

@@ -14,6 +14,7 @@ from homeassistant.helpers import area_registry as ar, entity_registry as er
 from .const import (
     API_ENTITIES_PATH,
     API_PROCESS_PATH,
+    API_STATUS_PATH,
     CONF_API_KEY,
     CONF_BASE_URL,
     CONF_MODEL,
@@ -183,6 +184,22 @@ class LightCompanionEntitiesView(HomeAssistantView):
             for state in hass.states.async_all("light")
         ]
         return self.json({"entities": entities})
+
+
+class LightCompanionStatusView(HomeAssistantView):
+    """Return frontend readiness information."""
+
+    url = API_STATUS_PATH
+    name = "api:lightcompanion:status"
+    requires_auth = True
+
+    async def get(self, request):
+        hass: HomeAssistant = request.app["hass"]
+        available_domains = {entry.domain for entry in hass.config_entries.async_entries()}
+        has_openai_integration = bool(
+            {"openai_conversation", "openai"}.intersection(available_domains)
+        )
+        return self.json({"openai_integration_available": has_openai_integration})
 
 
 class LightCompanionProcessView(HomeAssistantView):

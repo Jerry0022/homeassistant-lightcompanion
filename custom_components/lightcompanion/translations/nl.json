@@ -12,5 +12,9 @@
         }
       }
     }
+  },
+  "panel": {
+    "openai_missing": "OpenAI integration is missing.",
+    "open_integrations_cta": "Open Integrations"
   }
 }
