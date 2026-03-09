@@ -1,14 +1,12 @@
 name: "Light Companion App"
 slug: "lightcompanion_app"
-version: "0.2.0"
+version: "0.2.1"
 description: "Natural-language light control companion as a Home Assistant add-on app."
 url: "https://github.com/Jerry0022/homeassistant-lightcompanion"
 arch:
   - aarch64
   - amd64
   - armv7
-  - armhf
-  - i386
 startup: services
 boot: auto
 init: false
