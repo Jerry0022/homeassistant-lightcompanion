@@ -1,0 +1,12 @@
+{
+  "domain": "lightcompanion",
+  "name": "Light Companion",
+  "version": "0.1.0",
+  "documentation": "https://github.com/example/homeassistant-lightcompanion",
+  "issue_tracker": "https://github.com/example/homeassistant-lightcompanion/issues",
+  "config_flow": true,
+  "dependencies": ["http", "panel_custom"],
+  "codeowners": ["@yourname"],
+  "requirements": ["httpx>=0.27.0"],
+  "iot_class": "cloud_polling"
+}

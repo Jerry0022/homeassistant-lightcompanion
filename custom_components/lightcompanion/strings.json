@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Light Companion",
+        "description": "Configure your LLM provider.",
+        "data": {
+          "provider": "Provider",
+          "api_key": "API key",
+          "model": "Model",
+          "base_url": "Base URL"
+        }
+      }
+    }
+  }
+}
