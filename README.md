@@ -1,39 +1,33 @@
-# Home Assistant Light Companion
+# Home Assistant Light Companion (Add-on/App Repository)
 
-Eine moderne Home-Assistant-Custom-Integration (HACS), die natürlichsprachige Licht-Kommandos per externem LLM interpretiert und direkt auf `light`-Entitäten ausführt.
+Dieses Repository ist ein **Home Assistant Add-on-Repository** für den App-Store (Supervisor).
+Das Add-on stellt eine kleine Light-Companion-App bereit und ist für Lichtsteuerungs-Workflows im `light`-Domain-Kontext gedacht.
 
-## Features
-- Eigener Sidebar-Menüpunkt in Home Assistant: **Light Companion**
-- Direkt fokussiertes Eingabefeld (ideal für Android-Mikrofon/Voice-Input)
-- Unterstützt genau **einen aktiven LLM-Provider** zur Zeit (konfigurierbar)
-- Übergibt verfügbare `light`-Entitäten inkl. Fähigkeiten an das LLM
-- Erwartet strikt maschinenlesbares JSON und setzt daraus Licht-Aktionen um
-- UI-Log zeigt transparent, was interpretiert und ausgeführt wurde
-
-## Installation (HACS)
-1. HACS → **Integrations** → Menü → **Custom repositories**.
-2. Dieses GitHub-Repo als Integration hinzufügen.
-3. **Light Companion** installieren.
-4. Home Assistant neu starten.
-5. Einstellungen → Geräte & Dienste → Integration hinzufügen → **Light Companion**.
+## Installation (App-Store/Add-ons)
+1. Home Assistant → **Einstellungen** → **Add-ons** → **Add-on-Store**.
+2. Menü (⋮) → **Repositories**.
+3. Repository-URL einfügen:
+   - `https://github.com/Jerry0022/homeassistant-lightcompanion`
+4. Add-on **Light Companion App** installieren.
+5. In den Add-on-Optionen konfigurieren und starten.
 
 ## Konfiguration
-Bei der Einrichtung werden konfiguriert:
-- Provider (`openai`, `anthropic`, `google`)
-- API-Key
-- Modellname
-- Base-URL
+Unterstützte Provider (genau ein aktiver Provider):
+- `openai`
+- `anthropic`
+- `google`
 
-> Hinweis: Für `google` wird aktuell ein OpenAI-kompatibler Gateway-Endpunkt erwartet.
+Erforderliche Optionen:
+- `api_key`
+- `model`
+- `base_url`
 
-## Nutzung
-1. Sidebar: **Light Companion** öffnen.
-2. Befehl eingeben oder per Handy-Mikrofon diktieren (z. B. „Ich will Disco im Wohnzimmer“).
-3. Antwort wird als Aktionen auf `light`-Entitäten ausgeführt.
-4. Ergebnis im integrierten Log nachvollziehen.
+## API / UI
+- Ingress-Panel im Home Assistant Add-on verfügbar.
+- Healthcheck: `GET /health`
+- Laufzeitinfo: `GET /info`
 
-## Projektstruktur
-- `custom_components/lightcompanion/` – Integration
-- `custom_components/lightcompanion/frontend/` – Panel UI
-- `custom_components/lightcompanion/config_flow.py` – UI-Setup
-- `AGENTS.md` + `skills/` – Codex-Richtlinien für moderne HA-Entwicklung
+## Repository-Struktur
+- `repository.yaml` – Add-on-Repository Index
+- `addons/lightcompanion-app/config.yaml` – Add-on-Metadaten und Optionen
+- `addons/lightcompanion-app/` – Container-App
