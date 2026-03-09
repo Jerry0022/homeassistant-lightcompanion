@@ -10,6 +10,10 @@ const UI_TEXT = {
     llmInterpreting: "LLM is interpreting…",
     ready: "Ready",
     noActions: "No actions yet.",
+    model: "Model",
+    modelSaving: "Saving model…",
+    modelSaved: (model) => `Model switched to ${model}.`,
+    modelSaveFailed: (message) => `Failed to save model: ${message}`,
   },
   de: {
     readyLoaded: (count) => `Bereit: ${count} Licht-Entitäten geladen.`,
@@ -130,6 +134,8 @@ class LightCompanionPanel extends HTMLElement {
       _logs: { state: true },
       _entities: { state: true },
       _lang: { state: true },
+      _model: { state: true },
+      _availableModels: { state: true },
     };
   }
 
@@ -141,6 +147,8 @@ class LightCompanionPanel extends HTMLElement {
     this._logs = [];
     this._entities = [];
     this._lang = "en";
+    this._model = "";
+    this._availableModels = [];
   }
 
   set hass(hass) {
@@ -149,6 +157,9 @@ class LightCompanionPanel extends HTMLElement {
     this.render();
     if (this._entities.length === 0) {
       this._loadEntities();
+    }
+    if (this._availableModels.length === 0) {
+      this._loadOptions();
     }
   }
 
@@ -161,7 +172,7 @@ class LightCompanionPanel extends HTMLElement {
   }
 
   _t() {
-    return UI_TEXT[this._lang] || UI_TEXT.en;
+    return { ...UI_TEXT.en, ...(UI_TEXT[this._lang] || {}) };
   }
 
   async _loadEntities() {
@@ -174,6 +185,34 @@ class LightCompanionPanel extends HTMLElement {
     } catch (err) {
       this._log(t.loadError(err.message), "error");
       this.render();
+    }
+  }
+
+
+  async _loadOptions() {
+    try {
+      const response = await this._hass.callApi("GET", "lightcompanion/options");
+      this._model = response.model || "";
+      this._availableModels = response.available_models || [];
+      this.render();
+    } catch (_err) {
+      // Options are optional for panel rendering.
+    }
+  }
+
+  async _changeModel(nextModel) {
+    const t = this._t();
+    if (!nextModel || this._loading || nextModel === this._model) return;
+
+    this._log(t.modelSaving, "info");
+    try {
+      const response = await this._hass.callApi("POST", "lightcompanion/options", { model: nextModel });
+      this._model = response.model || nextModel;
+      this._availableModels = response.available_models || this._availableModels;
+      this._log(t.modelSaved(this._model), "success");
+      this.render();
+    } catch (err) {
+      this._log(t.modelSaveFailed(err.message), "error");
     }
   }
 
@@ -215,6 +254,9 @@ class LightCompanionPanel extends HTMLElement {
         :host { display:block; padding:24px; color: var(--primary-text-color); }
         .card { background: var(--card-background-color); border-radius: 16px; padding: 18px; box-shadow: var(--ha-card-box-shadow); }
         .top { display:flex; gap:10px; align-items:center; }
+        .controls { margin-bottom: 10px; display:flex; gap:10px; align-items:center; }
+        label { font-size: 13px; color: var(--secondary-text-color); }
+        select { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); color: var(--primary-text-color); }
         input { flex:1; padding:14px 16px; border-radius:12px; border: 1px solid var(--divider-color); background: var(--secondary-background-color); color: var(--primary-text-color); font-size:16px; }
         input:focus { outline: 2px solid var(--primary-color); }
         button { border:none; border-radius: 12px; padding: 0 18px; height: 46px; background: var(--primary-color); color: white; font-weight:600; cursor:pointer; }
@@ -227,6 +269,12 @@ class LightCompanionPanel extends HTMLElement {
         .log:last-child { border-bottom:none; }
       </style>
       <div class="card">
+        <div class="controls">
+          <label for="model">${t.model}</label>
+          <select id="model" ${this._loading || this._availableModels.length === 0 ? "disabled" : ""}>
+            ${(this._availableModels || []).map((model) => `<option value="${model}" ${model === this._model ? "selected" : ""}>${model}</option>`).join("")}
+          </select>
+        </div>
         <div class="top">
           <input id="prompt" placeholder="${t.placeholder}" value="${this._text.replaceAll('"', '&quot;')}" ${this._loading ? "disabled" : ""} />
           <button id="send" ${this._loading ? "disabled" : ""}>${this._loading ? t.running : t.send}</button>
@@ -241,6 +289,7 @@ class LightCompanionPanel extends HTMLElement {
 
     const input = this.shadowRoot.querySelector("#prompt");
     const send = this.shadowRoot.querySelector("#send");
+    const model = this.shadowRoot.querySelector("#model");
 
     input?.addEventListener("input", (ev) => {
       this._text = ev.target.value;
@@ -254,6 +303,8 @@ class LightCompanionPanel extends HTMLElement {
     });
 
     send?.addEventListener("click", () => this._submit());
+
+    model?.addEventListener("change", (ev) => this._changeModel(ev.target.value));
 
     setTimeout(() => {
       if (!this._loading) input?.focus();

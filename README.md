@@ -17,8 +17,10 @@ Supported providers (one active provider at a time):
 
 Required provider settings:
 - `api_key`
-- `model`
+- `model` (switchable in the panel)
 - `base_url`
+
+For OpenAI, this integration is intended to work with your existing Home Assistant OpenAI integration setup (no separate external app server).
 
 
 ## Updating

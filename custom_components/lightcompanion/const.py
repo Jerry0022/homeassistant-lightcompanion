@@ -22,6 +22,13 @@ PANEL_MODULE_PATH = "/api/lightcompanion/static/lightcompanion-panel.js"
 
 API_PROCESS_PATH = "/api/lightcompanion/process"
 API_ENTITIES_PATH = "/api/lightcompanion/entities"
+API_OPTIONS_PATH = "/api/lightcompanion/options"
+
+PROVIDER_MODELS: dict[str, list[str]] = {
+    "openai": ["gpt-4o-mini", "gpt-4o", "gpt-4.1-mini", "gpt-4.1"],
+    "anthropic": ["claude-3-5-haiku-latest", "claude-3-5-sonnet-latest"],
+    "google": ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"],
+}
 
 JSON_SCHEMA_HINT = {
     "type": "object",

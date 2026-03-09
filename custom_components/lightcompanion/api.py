@@ -14,6 +14,7 @@ from homeassistant.helpers import area_registry as ar, entity_registry as er
 from .const import (
     API_ENTITIES_PATH,
     API_PROCESS_PATH,
+    API_OPTIONS_PATH,
     CONF_API_KEY,
     CONF_BASE_URL,
     CONF_MODEL,
@@ -23,17 +24,15 @@ from .const import (
     DEFAULT_PROVIDER,
     DOMAIN,
     JSON_SCHEMA_HINT,
+    PROVIDER_MODELS,
 )
 
 PROCESS_SCHEMA = vol.Schema({vol.Required("text"): str})
+OPTIONS_SCHEMA = vol.Schema({vol.Required(CONF_MODEL): str})
 
 
 def _active_config(hass: HomeAssistant) -> dict[str, Any]:
-    entries = list(hass.config_entries.async_entries(DOMAIN))
-    if not entries:
-        raise ValueError("No Light Companion configuration found")
-
-    entry = entries[0]
+    entry = _primary_entry(hass)
     config = {**entry.data, **entry.options}
     return {
         CONF_PROVIDER: config.get(CONF_PROVIDER, DEFAULT_PROVIDER),
@@ -41,6 +40,13 @@ def _active_config(hass: HomeAssistant) -> dict[str, Any]:
         CONF_MODEL: config.get(CONF_MODEL, DEFAULT_MODEL),
         CONF_BASE_URL: config.get(CONF_BASE_URL, DEFAULT_BASE_URL),
     }
+
+
+def _primary_entry(hass: HomeAssistant):
+    entries = list(hass.config_entries.async_entries(DOMAIN))
+    if not entries:
+        raise ValueError("No Light Companion configuration found")
+    return entries[0]
 
 
 def _serialize_light_entity(
@@ -183,6 +189,44 @@ class LightCompanionEntitiesView(HomeAssistantView):
             for state in hass.states.async_all("light")
         ]
         return self.json({"entities": entities})
+
+
+class LightCompanionOptionsView(HomeAssistantView):
+    """Read and update runtime options."""
+
+    url = API_OPTIONS_PATH
+    name = "api:lightcompanion:options"
+    requires_auth = True
+
+    async def get(self, request):
+        hass: HomeAssistant = request.app["hass"]
+        config = _active_config(hass)
+        provider = config[CONF_PROVIDER]
+        return self.json(
+            {
+                CONF_PROVIDER: provider,
+                CONF_MODEL: config[CONF_MODEL],
+                "available_models": PROVIDER_MODELS.get(provider, []),
+            }
+        )
+
+    async def post(self, request):
+        hass: HomeAssistant = request.app["hass"]
+        body = OPTIONS_SCHEMA(await request.json())
+        entry = _primary_entry(hass)
+
+        options = {**entry.options, CONF_MODEL: body[CONF_MODEL]}
+        hass.config_entries.async_update_entry(entry, options=options)
+
+        config = _active_config(hass)
+        provider = config[CONF_PROVIDER]
+        return self.json(
+            {
+                CONF_PROVIDER: provider,
+                CONF_MODEL: config[CONF_MODEL],
+                "available_models": PROVIDER_MODELS.get(provider, []),
+            }
+        )
 
 
 class LightCompanionProcessView(HomeAssistantView):
