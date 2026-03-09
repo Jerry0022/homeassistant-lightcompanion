@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.5
+## 0.2.6
 
 - Bump integration and add-on version metadata so Home Assistant can detect a newer update.
 

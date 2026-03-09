@@ -1,7 +1,7 @@
 {
   "domain": "lightcompanion",
   "name": "Light Companion",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "documentation": "https://github.com/example/homeassistant-lightcompanion",
   "issue_tracker": "https://github.com/example/homeassistant-lightcompanion/issues",
   "integration_type": "service",
