@@ -1,0 +1,16 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Light Companion",
+        "description": "配置你的 LLM 提供商。",
+        "data": {
+          "provider": "提供商",
+          "api_key": "API 密钥",
+          "model": "模型",
+          "base_url": "基础 URL"
+        }
+      }
+    }
+  }
+}

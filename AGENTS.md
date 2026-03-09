@@ -28,6 +28,8 @@ These instructions apply to the whole repository.
 - Keep README short and practical with installation and usage.
 - Document supported providers and required API keys.
 - Mention that the integration controls entities in the `light` domain.
+- Write repository and skill documentation in English by default.
+- Localizations may provide non-English text, but fallback/source strings must remain English.
 
 ## Skills in this repository
 - Keep reusable Codex guidance in `skills/`.

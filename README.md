@@ -1,33 +1,30 @@
-# Home Assistant Light Companion (Add-on/App Repository)
+# Home Assistant Light Companion
 
-Dieses Repository ist ein **Home Assistant Add-on-Repository** für den App-Store (Supervisor).
-Das Add-on stellt eine kleine Light-Companion-App bereit und ist für Lichtsteuerungs-Workflows im `light`-Domain-Kontext gedacht.
+Light Companion is a Home Assistant custom integration that lets you control entities in the `light` domain with natural-language commands interpreted by an LLM.
 
-## Installation (App-Store/Add-ons)
-1. Home Assistant → **Einstellungen** → **Add-ons** → **Add-on-Store**.
-2. Menü (⋮) → **Repositories**.
-3. Repository-URL einfügen:
-   - `https://github.com/Jerry0022/homeassistant-lightcompanion`
-4. Add-on **Light Companion App** installieren.
-5. In den Add-on-Optionen konfigurieren und starten.
+## Installation (HACS)
+1. Open HACS in Home Assistant.
+2. Add this repository as a custom repository.
+3. Install **Light Companion**.
+4. Restart Home Assistant.
+5. Go to **Settings → Devices & Services → Add Integration** and add **Light Companion**.
 
-## Konfiguration
-Unterstützte Provider (genau ein aktiver Provider):
+## Configuration
+Supported providers (one active provider at a time):
 - `openai`
 - `anthropic`
 - `google`
 
-Erforderliche Optionen:
+Required provider settings:
 - `api_key`
 - `model`
 - `base_url`
 
-## API / UI
-- Ingress-Panel im Home Assistant Add-on verfügbar.
-- Healthcheck: `GET /health`
-- Laufzeitinfo: `GET /info`
+## Usage
+- Open the **Light Companion** sidebar panel.
+- Enter a command such as “Set living room lights to warm white at 40%”.
+- The integration validates strict JSON action output before running light service calls.
 
-## Repository-Struktur
-- `repository.yaml` – Add-on-Repository Index
-- `addons/lightcompanion-app/config.yaml` – Add-on-Metadaten und Optionen
-- `addons/lightcompanion-app/` – Container-App
+## Notes
+- The integration only targets entities in the `light` domain.
+- Keep API keys in config entry options; never hardcode secrets.

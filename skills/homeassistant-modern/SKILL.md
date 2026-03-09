@@ -14,6 +14,8 @@ Use this skill when implementing or updating Home Assistant custom integrations 
    - strict JSON schema response
    - validate before applying actions
 5. Ensure HACS-friendly repository structure.
+6. Keep documentation and guidance text in English by default.
+7. Keep localization files translatable, but ensure fallback/source strings are English.
 
 ## Checklist
 - [ ] `manifest.json` contains integration metadata and dependencies.
