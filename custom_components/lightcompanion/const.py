@@ -16,7 +16,7 @@ DEFAULT_BASE_URL = "https://api.openai.com/v1"
 
 PANEL_URL_PATH = "lightcompanion"
 PANEL_TITLE = "Light Companion"
-PANEL_ICON = "mdi:lightbulb-group"
+PANEL_ICON = "mdi:head-lightbulb"
 PANEL_COMPONENT_NAME = "lightcompanion-panel"
 PANEL_MODULE_PATH = "/api/lightcompanion/static/lightcompanion-panel.js"
 
