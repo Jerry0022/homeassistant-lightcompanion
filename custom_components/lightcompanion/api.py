@@ -196,6 +196,11 @@ class LightCompanionOptionsView(HomeAssistantView):
 
     url = API_OPTIONS_PATH
     name = "api:lightcompanion:options"
+class LightCompanionStatusView(HomeAssistantView):
+    """Return frontend readiness information."""
+
+    url = API_STATUS_PATH
+    name = "api:lightcompanion:status"
     requires_auth = True
 
     async def get(self, request):
@@ -227,6 +232,11 @@ class LightCompanionOptionsView(HomeAssistantView):
                 "available_models": PROVIDER_MODELS.get(provider, []),
             }
         )
+        available_domains = {entry.domain for entry in hass.config_entries.async_entries()}
+        has_openai_integration = bool(
+            {"openai_conversation", "openai"}.intersection(available_domains)
+        )
+        return self.json({"openai_integration_available": has_openai_integration})
 
 
 class LightCompanionProcessView(HomeAssistantView):

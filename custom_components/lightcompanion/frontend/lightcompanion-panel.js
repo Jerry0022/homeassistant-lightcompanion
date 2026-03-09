@@ -14,6 +14,8 @@ const UI_TEXT = {
     modelSaving: "Saving model…",
     modelSaved: (model) => `Model switched to ${model}.`,
     modelSaveFailed: (message) => `Failed to save model: ${message}`,
+    openAiMissing: "OpenAI integration is missing.",
+    openIntegrationsCta: "Open Integrations",
   },
   de: {
     readyLoaded: (count) => `Bereit: ${count} Licht-Entitäten geladen.`,
@@ -26,6 +28,8 @@ const UI_TEXT = {
     llmInterpreting: "LLM interpretiert…",
     ready: "Bereit",
     noActions: "Noch keine Aktionen.",
+    openAiMissing: "OpenAI-Integration fehlt.",
+    openIntegrationsCta: "Integrationen öffnen",
   },
   fr: {
     readyLoaded: (count) => `Prêt : ${count} entités light chargées.`,
@@ -136,6 +140,8 @@ class LightCompanionPanel extends HTMLElement {
       _lang: { state: true },
       _model: { state: true },
       _availableModels: { state: true },
+      _openAiIntegrationAvailable: { state: true },
+      _statusLoaded: { state: true },
     };
   }
 
@@ -149,18 +155,36 @@ class LightCompanionPanel extends HTMLElement {
     this._lang = "en";
     this._model = "";
     this._availableModels = [];
+    this._openAiIntegrationAvailable = null;
+    this._statusLoaded = false;
   }
 
   set hass(hass) {
     this._hass = hass;
     this._lang = this._resolveLanguage(hass?.language);
     this.render();
+    if (!this._statusLoaded) {
+      this._loadStatus();
+    }
     if (this._entities.length === 0) {
       this._loadEntities();
     }
     if (this._availableModels.length === 0) {
       this._loadOptions();
     }
+  }
+
+  async _loadStatus() {
+    try {
+      const response = await this._hass.callApi("GET", "lightcompanion/status");
+      this._openAiIntegrationAvailable = !!response.openai_integration_available;
+      this._statusLoaded = true;
+    } catch (err) {
+      this._statusLoaded = true;
+      this._openAiIntegrationAvailable = null;
+      this._log(`⚠️ Failed to load status: ${err.message}`, "error");
+    }
+    this.render();
   }
 
   _resolveLanguage(language) {
@@ -222,7 +246,7 @@ class LightCompanionPanel extends HTMLElement {
 
   async _submit() {
     const t = this._t();
-    if (!this._text.trim() || this._loading) return;
+    if (!this._text.trim() || this._loading || this._openAiIntegrationAvailable === false) return;
 
     this._loading = true;
     this._log(`🗣️ ${this._text}`, "user");
@@ -249,6 +273,7 @@ class LightCompanionPanel extends HTMLElement {
     if (!this.shadowRoot) return;
     const t = this._t();
 
+    const canUsePrompt = this._openAiIntegrationAvailable !== false;
     this.shadowRoot.innerHTML = `
       <style>
         :host { display:block; padding:24px; color: var(--primary-text-color); }
@@ -267,6 +292,9 @@ class LightCompanionPanel extends HTMLElement {
         .logs { margin-top:16px; max-height: 55vh; overflow:auto; background: var(--secondary-background-color); border-radius: 12px; padding: 10px; }
         .log { padding:8px 10px; border-bottom: 1px solid var(--divider-color); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
         .log:last-child { border-bottom:none; }
+        .warning { margin-top: 10px; padding: 12px; border-radius: 12px; background: color-mix(in srgb, var(--error-color) 12%, transparent); color: var(--primary-text-color); }
+        .warning-title { font-weight: 600; margin-bottom: 8px; }
+        .cta { background: var(--primary-color); }
       </style>
       <div class="card">
         <div class="controls">
@@ -276,9 +304,10 @@ class LightCompanionPanel extends HTMLElement {
           </select>
         </div>
         <div class="top">
-          <input id="prompt" placeholder="${t.placeholder}" value="${this._text.replaceAll('"', '&quot;')}" ${this._loading ? "disabled" : ""} />
-          <button id="send" ${this._loading ? "disabled" : ""}>${this._loading ? t.running : t.send}</button>
+          <input id="prompt" placeholder="${t.placeholder}" value="${this._text.replaceAll('"', '&quot;')}" ${this._loading || !canUsePrompt ? "disabled" : ""} />
+          <button id="send" ${this._loading || !canUsePrompt ? "disabled" : ""}>${this._loading ? t.running : t.send}</button>
         </div>
+        ${!canUsePrompt ? `<div class="warning"><div class="warning-title">${t.openAiMissing || UI_TEXT.en.openAiMissing}</div><button id="open-integrations" class="cta">${t.openIntegrationsCta || UI_TEXT.en.openIntegrationsCta}</button></div>` : ""}
         <div class="hint">${t.voiceHint}</div>
         <div class="status"><span class="dot"></span><span>${this._loading ? t.llmInterpreting : t.ready}</span></div>
         <div class="logs">
@@ -290,6 +319,7 @@ class LightCompanionPanel extends HTMLElement {
     const input = this.shadowRoot.querySelector("#prompt");
     const send = this.shadowRoot.querySelector("#send");
     const model = this.shadowRoot.querySelector("#model");
+    const integrationsBtn = this.shadowRoot.querySelector("#open-integrations");
 
     input?.addEventListener("input", (ev) => {
       this._text = ev.target.value;
@@ -303,6 +333,14 @@ class LightCompanionPanel extends HTMLElement {
     });
 
     send?.addEventListener("click", () => this._submit());
+    integrationsBtn?.addEventListener("click", () => {
+      const path = "/config/integrations/dashboard";
+      if (this._hass?.navigate) {
+        this._hass.navigate(path);
+        return;
+      }
+      window.location.assign(path);
+    });
 
     model?.addEventListener("change", (ev) => this._changeModel(ev.target.value));
 

@@ -29,6 +29,7 @@ PROVIDER_MODELS: dict[str, list[str]] = {
     "anthropic": ["claude-3-5-haiku-latest", "claude-3-5-sonnet-latest"],
     "google": ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"],
 }
+API_STATUS_PATH = "/api/lightcompanion/status"
 
 JSON_SCHEMA_HINT = {
     "type": "object",
