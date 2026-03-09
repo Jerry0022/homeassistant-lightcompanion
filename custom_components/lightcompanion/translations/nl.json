@@ -3,11 +3,11 @@
     "step": {
       "user": {
         "title": "Light Companion",
-        "description": "Konfiguriere deinen LLM-Anbieter.",
+        "description": "Configureer je LLM-provider.",
         "data": {
-          "provider": "Anbieter",
-          "api_key": "API-Schlüssel",
-          "model": "Modell",
+          "provider": "Provider",
+          "api_key": "API-sleutel",
+          "model": "Model",
           "base_url": "Basis-URL"
         }
       }
