@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from homeassistant.helpers import selector
+
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -17,7 +19,19 @@ from .const import (
     DEFAULT_MODEL,
     DEFAULT_PROVIDER,
     DOMAIN,
+    PROVIDER_MODELS,
 )
+
+
+def _model_selector(provider: str) -> selector.SelectSelector:
+    """Build a model selector for selected provider."""
+    return selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=PROVIDER_MODELS.get(provider, []),
+            custom_value=True,
+            mode=selector.SelectSelectorMode.DROPDOWN,
+        )
+    )
 
 
 class LightCompanionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -34,13 +48,17 @@ class LightCompanionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title="Light Companion", data=user_input)
 
+        provider = (user_input or {}).get(CONF_PROVIDER, DEFAULT_PROVIDER)
         schema = vol.Schema(
             {
-                vol.Required(CONF_PROVIDER, default=DEFAULT_PROVIDER): vol.In(
-                    ["openai", "anthropic", "google"]
+                vol.Required(CONF_PROVIDER, default=provider): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=["openai", "anthropic", "google"],
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
                 ),
                 vol.Required(CONF_API_KEY): str,
-                vol.Required(CONF_MODEL, default=DEFAULT_MODEL): str,
+                vol.Required(CONF_MODEL, default=DEFAULT_MODEL): _model_selector(provider),
                 vol.Required(CONF_BASE_URL, default=DEFAULT_BASE_URL): str,
             }
         )
@@ -63,13 +81,17 @@ class LightCompanionOptionsFlow(config_entries.OptionsFlow):
             return self.async_create_entry(title="", data=user_input)
 
         data = {**self.config_entry.data, **self.config_entry.options}
+        provider = data.get(CONF_PROVIDER, DEFAULT_PROVIDER)
         schema = vol.Schema(
             {
-                vol.Required(CONF_PROVIDER, default=data.get(CONF_PROVIDER, DEFAULT_PROVIDER)): vol.In(
-                    ["openai", "anthropic", "google"]
+                vol.Required(CONF_PROVIDER, default=provider): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=["openai", "anthropic", "google"],
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
                 ),
                 vol.Required(CONF_API_KEY, default=data.get(CONF_API_KEY, "")): str,
-                vol.Required(CONF_MODEL, default=data.get(CONF_MODEL, DEFAULT_MODEL)): str,
+                vol.Required(CONF_MODEL, default=data.get(CONF_MODEL, DEFAULT_MODEL)): _model_selector(provider),
                 vol.Required(CONF_BASE_URL, default=data.get(CONF_BASE_URL, DEFAULT_BASE_URL)): str,
             }
         )
