@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from typing import Any
 
-import httpx
 import voluptuous as vol
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.core import HomeAssistant, State
@@ -14,15 +13,11 @@ from homeassistant.helpers import area_registry as ar, entity_registry as er
 from .const import (
     API_ENTITIES_PATH,
     API_PROCESS_PATH,
-    CONF_API_KEY,
-    CONF_BASE_URL,
-    CONF_MODEL,
-    CONF_PROVIDER,
-    DEFAULT_BASE_URL,
-    DEFAULT_MODEL,
-    DEFAULT_PROVIDER,
+    CONF_LLM_SOURCE,
     DOMAIN,
     JSON_SCHEMA_HINT,
+    LLM_SOURCE_HA_OPENAI,
+    OPENAI_INTEGRATION_DOMAIN,
 )
 
 PROCESS_SCHEMA = vol.Schema({vol.Required("text"): str})
@@ -36,10 +31,7 @@ def _active_config(hass: HomeAssistant) -> dict[str, Any]:
     entry = entries[0]
     config = {**entry.data, **entry.options}
     return {
-        CONF_PROVIDER: config.get(CONF_PROVIDER, DEFAULT_PROVIDER),
-        CONF_API_KEY: config.get(CONF_API_KEY, ""),
-        CONF_MODEL: config.get(CONF_MODEL, DEFAULT_MODEL),
-        CONF_BASE_URL: config.get(CONF_BASE_URL, DEFAULT_BASE_URL),
+        CONF_LLM_SOURCE: config.get(CONF_LLM_SOURCE, LLM_SOURCE_HA_OPENAI),
     }
 
 
@@ -81,58 +73,33 @@ def _build_prompt(user_text: str, entities: list[dict[str, Any]]) -> str:
     )
 
 
-async def _call_provider(config: dict[str, Any], prompt: str) -> str:
-    provider = config[CONF_PROVIDER]
-    api_key = config[CONF_API_KEY]
-    model = config[CONF_MODEL]
-    base_url = config[CONF_BASE_URL]
+async def _call_ha_openai(hass: HomeAssistant, prompt: str) -> str:
+    openai_entries = hass.config_entries.async_entries(OPENAI_INTEGRATION_DOMAIN)
+    if not openai_entries:
+        raise ValueError("Home Assistant OpenAI integration is not configured")
 
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    response = await hass.services.async_call(
+        "conversation",
+        "process",
+        {
+            "agent_id": openai_entries[0].entry_id,
+            "text": prompt,
+        },
+        blocking=True,
+        return_response=True,
+    )
 
-    if provider == "openai":
-        url = f"{base_url.rstrip('/')}/chat/completions"
-        payload = {
-            "model": model,
-            "temperature": 0,
-            "response_format": {"type": "json_object"},
-            "messages": [
-                {"role": "system", "content": "Return strict JSON only."},
-                {"role": "user", "content": prompt},
-            ],
-        }
-    elif provider == "anthropic":
-        url = f"{base_url.rstrip('/')}/messages"
-        headers = {
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        }
-        payload = {
-            "model": model,
-            "max_tokens": 1000,
-            "messages": [{"role": "user", "content": prompt}],
-        }
-    else:  # google (OpenAI-compatible gateway expected)
-        url = f"{base_url.rstrip('/')}/chat/completions"
-        payload = {
-            "model": model,
-            "temperature": 0,
-            "response_format": {"type": "json_object"},
-            "messages": [
-                {"role": "system", "content": "Return strict JSON only."},
-                {"role": "user", "content": prompt},
-            ],
-        }
+    speech = response.get("response", {}).get("speech", {}).get("plain", {}).get("speech")
+    if not speech:
+        raise ValueError("No response returned by Home Assistant OpenAI conversation agent")
+    return speech
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.post(url, headers=headers, json=payload)
-        resp.raise_for_status()
-        data = resp.json()
 
-    if provider == "anthropic":
-        return data["content"][0]["text"]
+async def _call_provider(hass: HomeAssistant, config: dict[str, Any], prompt: str) -> str:
+    if config[CONF_LLM_SOURCE] == LLM_SOURCE_HA_OPENAI:
+        return await _call_ha_openai(hass, prompt)
 
-    return data["choices"][0]["message"]["content"]
+    raise ValueError("Unsupported LLM source")
 
 
 def _parse_actions(raw: str) -> dict[str, Any]:
@@ -206,7 +173,7 @@ class LightCompanionProcessView(HomeAssistantView):
         config = _active_config(hass)
 
         prompt = _build_prompt(body["text"], entities)
-        raw = await _call_provider(config, prompt)
+        raw = await _call_provider(hass, config, prompt)
         parsed = _parse_actions(raw)
         results = await _execute_actions(hass, parsed.get("actions", []))
 

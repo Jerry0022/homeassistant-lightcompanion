@@ -3,14 +3,11 @@
     "step": {
       "user": {
         "title": "Light Companion",
-        "description": "Configure your LLM provider.",
-        "data": {
-          "provider": "Provider",
-          "api_key": "API key",
-          "model": "Model",
-          "base_url": "Base URL"
-        }
+        "description": "Light Companion uses Home Assistant's OpenAI integration for LLM access."
       }
+    },
+    "abort": {
+      "missing_openai": "No configured Home Assistant OpenAI integration was found. Set up the OpenAI Conversation integration first (Settings > Devices & Services > Add Integration > OpenAI Conversation), then retry Light Companion."
     }
   }
 }
