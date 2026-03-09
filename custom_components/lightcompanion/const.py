@@ -22,6 +22,7 @@ PANEL_MODULE_PATH = "/api/lightcompanion/static/lightcompanion-panel.js"
 
 API_PROCESS_PATH = "/api/lightcompanion/process"
 API_ENTITIES_PATH = "/api/lightcompanion/entities"
+API_STATUS_PATH = "/api/lightcompanion/status"
 
 JSON_SCHEMA_HINT = {
     "type": "object",
