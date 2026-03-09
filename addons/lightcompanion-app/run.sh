@@ -3,4 +3,4 @@ set -euo pipefail
 
 mkdir -p /data
 
-exec python -m app.main
+exec /opt/venv/bin/python -m app.main
