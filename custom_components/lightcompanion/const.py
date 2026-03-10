@@ -20,7 +20,7 @@ OPENAI_INTEGRATION_DOMAIN = "openai_conversation"
 
 PANEL_URL_PATH = "lightcompanion"
 PANEL_TITLE = "Light Companion"
-PANEL_ICON = "mdi:head-lightbulb"
+PANEL_ICON = "mdi:message-processing-outline"
 PANEL_COMPONENT_NAME = "lightcompanion-panel"
 PANEL_MODULE_PATH = "/api/lightcompanion/static/lightcompanion-panel.js"
 
