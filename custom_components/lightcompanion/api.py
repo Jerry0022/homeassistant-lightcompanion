@@ -23,7 +23,7 @@ from .const import (
     DOMAIN,
     JSON_SCHEMA_HINT,
     LLM_SOURCE_HA_OPENAI,
-    OPENAI_INTEGRATION_DOMAIN,
+    OPENAI_INTEGRATION_DOMAINS,
     PROVIDER_MODELS,
 )
 
@@ -87,7 +87,10 @@ def _build_prompt(user_text: str, entities: list[dict[str, Any]]) -> str:
 
 
 async def _call_ha_openai(hass: HomeAssistant, prompt: str) -> str:
-    openai_entries = hass.config_entries.async_entries(OPENAI_INTEGRATION_DOMAIN)
+    openai_entries = []
+    for domain in OPENAI_INTEGRATION_DOMAINS:
+        openai_entries.extend(hass.config_entries.async_entries(domain))
+
     if not openai_entries:
         raise ValueError("Home Assistant OpenAI integration is not configured")
 
@@ -218,7 +221,7 @@ class LightCompanionStatusView(HomeAssistantView):
         hass: HomeAssistant = request.app["hass"]
         available_domains = {entry.domain for entry in hass.config_entries.async_entries()}
         has_openai_integration = bool(
-            {"openai_conversation", "openai"}.intersection(available_domains)
+            set(OPENAI_INTEGRATION_DOMAINS).intersection(available_domains)
         )
         return self.json({"openai_integration_available": has_openai_integration})
 
