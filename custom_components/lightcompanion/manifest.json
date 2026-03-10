@@ -1,9 +1,9 @@
 {
   "domain": "lightcompanion",
   "name": "Light Companion",
-  "version": "0.2.6",
-  "documentation": "https://github.com/example/homeassistant-lightcompanion",
-  "issue_tracker": "https://github.com/example/homeassistant-lightcompanion/issues",
+  "version": "0.2.7",
+  "documentation": "https://github.com/Jerry0022/homeassistant-lightcompanion",
+  "issue_tracker": "https://github.com/Jerry0022/homeassistant-lightcompanion/issues",
   "integration_type": "service",
   "config_flow": true,
   "dependencies": [
@@ -11,7 +11,7 @@
     "frontend"
   ],
   "codeowners": [
-    "@yourname"
+    "@Jerry0022"
   ],
   "requirements": [
     "httpx>=0.27.0"

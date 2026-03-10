@@ -18,6 +18,13 @@ These instructions apply to the whole repository.
 - Keep provider integrations isolated and easy to extend.
 - Never hardcode secrets; API keys belong in config entry options.
 
+
+## Versioning and release hygiene
+- For **every repository change**, update integration version using semantic versioning in `custom_components/lightcompanion/manifest.json`.
+- At minimum, bump the **patch** version for fixes/docs/chore-level repo changes that affect delivered integration package.
+- Bump **minor** for new functionality; bump **major** only on explicit owner request.
+- Before finishing, verify the version bump is included in the commit.
+
 ## LLM safety and behavior
 - Only one LLM provider may be active at a time.
 - Prompting must include available `light` entities and capabilities.
