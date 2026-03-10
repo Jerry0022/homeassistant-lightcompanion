@@ -24,6 +24,10 @@ These instructions apply to the whole repository.
 - At minimum, bump the **patch** version for fixes/docs/chore-level repo changes that affect delivered integration package.
 - Bump **minor** for new functionality; bump **major** only on explicit owner request.
 - Before finishing, verify the version bump is included in the commit.
+- Treat version updates as a mandatory checklist item (do not skip it):
+  1. Bump `custom_components/lightcompanion/manifest.json`.
+  2. Confirm there is no stale older version string left in repo docs/examples.
+  3. Ensure the PR/commit clearly mentions the version bump so HACS/Home Assistant detects a new package revision.
 
 ## LLM safety and behavior
 - Only one LLM provider may be active at a time.
