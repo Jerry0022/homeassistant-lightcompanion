@@ -9,6 +9,20 @@ Light Companion is a Home Assistant custom integration that lets you control ent
 4. Restart Home Assistant.
 5. Go to **Settings → Devices & Services → Add Integration** and add **Light Companion**.
 
+### Do I need HACS?
+- HACS is only an **installation channel** for this custom integration.
+- The runtime setup is always done via Home Assistant: **Settings → Devices & Services → Add Integration → Light Companion**.
+
+### Installation without HACS (manual)
+1. Copy `custom_components/lightcompanion` to your HA config directory at `config/custom_components/lightcompanion`.
+2. Restart Home Assistant.
+3. Open **Settings → Devices & Services → Add Integration** and add **Light Companion**.
+
+### Why it is not listed directly in Home Assistant integrations
+- Home Assistant's built-in integration catalog lists integrations shipped with HA Core.
+- Light Companion is a **custom integration**, so HA can only list it after you install its files (via HACS or manual copy).
+- This repository can be added as a custom repository in HACS, but appearing in the global default HACS catalog requires separate HACS review/acceptance.
+
 ## Configuration
 Supported providers (one active provider at a time):
 - `openai`
