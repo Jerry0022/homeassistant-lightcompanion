@@ -278,6 +278,11 @@ class LightCompanionPanel extends HTMLElement {
       <style>
         :host { display:block; padding:24px; color: var(--primary-text-color); }
         .card { background: var(--card-background-color); border-radius: 16px; padding: 18px; box-shadow: var(--ha-card-box-shadow); }
+        .brand { display:flex; align-items:center; gap:12px; margin-bottom: 14px; }
+        .brand-icon { width:42px; height:42px; border-radius: 12px; background: color-mix(in srgb, var(--primary-color) 18%, transparent); display:flex; align-items:center; justify-content:center; }
+        .brand-icon svg { width:28px; height:28px; }
+        .brand-title { font-weight: 700; font-size: 16px; line-height: 1.2; }
+        .brand-subtitle { font-size: 12px; color: var(--secondary-text-color); }
         .top { display:flex; gap:10px; align-items:center; }
         .controls { margin-bottom: 10px; display:flex; gap:10px; align-items:center; }
         label { font-size: 13px; color: var(--secondary-text-color); }
@@ -297,6 +302,21 @@ class LightCompanionPanel extends HTMLElement {
         .cta { background: var(--primary-color); }
       </style>
       <div class="card">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="10" width="52" height="40" rx="18" fill="var(--primary-color)" fill-opacity="0.22"/>
+              <path d="M24 29c0-4.8 3.7-8.5 8.5-8.5S41 24.2 41 29c0 3-1.4 5-3.7 6.8-.8.6-1.3 1.6-1.3 2.7h-7c0-1.1-.5-2.1-1.3-2.7C25.4 34 24 32 24 29Z" fill="var(--primary-color)"/>
+              <rect x="29" y="40.5" width="7" height="2.8" rx="1.4" fill="var(--primary-color)"/>
+              <circle cx="17" cy="23" r="2" fill="var(--warning-color, #f5a623)"/>
+              <circle cx="48" cy="20" r="1.8" fill="var(--warning-color, #f5a623)"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">Light Companion</div>
+            <div class="brand-subtitle">AI Light Bubble Service</div>
+          </div>
+        </div>
         <div class="controls">
           <label for="model">${t.model}</label>
           <select id="model" ${this._loading || this._availableModels.length === 0 ? "disabled" : ""}>
