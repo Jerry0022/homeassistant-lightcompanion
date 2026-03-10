@@ -20,6 +20,7 @@ Use this skill when implementing or updating Home Assistant custom integrations 
    - At minimum, bump the patch version (last number) for any change.
    - For functional extensions (new functionality, not bug fixes or improvements), bump the minor version (middle number).
    - Bump the major version (first number) only when explicitly requested by the repository owner/user.
+   - Always include the version bump in the same commit as the code change.
 
 ## Checklist
 - [ ] `manifest.json` contains integration metadata and dependencies.
@@ -29,3 +30,4 @@ Use this skill when implementing or updating Home Assistant custom integrations 
 - [ ] Backend exposes secure API endpoints under `/api/...` and uses HA auth.
 - [ ] README explains install via custom repository and usage flow.
 - [ ] Version was bumped according to semver policy (patch for any change, minor for new functionality, major only on explicit request).
+- [ ] Version bump is committed together with the related code/docs changes.
