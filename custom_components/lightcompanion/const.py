@@ -16,7 +16,7 @@ DEFAULT_MODEL = "gpt-4o-mini"
 DEFAULT_BASE_URL = "https://api.openai.com/v1"
 
 LLM_SOURCE_HA_OPENAI = "ha_openai"
-OPENAI_INTEGRATION_DOMAIN = "openai_conversation"
+OPENAI_INTEGRATION_DOMAINS = ("openai_conversation", "openai")
 
 PANEL_URL_PATH = "lightcompanion"
 PANEL_TITLE = "Light Companion"
