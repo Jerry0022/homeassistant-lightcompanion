@@ -5,7 +5,7 @@ Light Companion is a Home Assistant custom integration that lets you control ent
 ## Installation (HACS)
 1. Open HACS in Home Assistant.
 2. Go to **HACS → 3-dot menu → Custom repositories**.
-3. Add repository URL `https://github.com/jamct/lightcompanion` with category **Integration**.
+3. Add repository URL `https://github.com/Jerry0022/homeassistant-lightcompanion` with category **Integration**.
 4. Search for **Light Companion** in HACS and install it.
 5. Restart Home Assistant.
 6. Go to **Settings → Devices & Services → Add Integration** and add **Light Companion**.
