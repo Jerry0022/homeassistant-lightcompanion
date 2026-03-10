@@ -16,7 +16,7 @@ from .const import (
     CONF_LLM_SOURCE,
     DOMAIN,
     LLM_SOURCE_HA_OPENAI,
-    OPENAI_INTEGRATION_DOMAIN,
+    OPENAI_INTEGRATION_DOMAINS,
 )
 from .panel import async_register_panel, async_unregister_panel
 
@@ -32,8 +32,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     merged_config = {**entry.data, **entry.options}
     llm_source = merged_config.get(CONF_LLM_SOURCE, LLM_SOURCE_HA_OPENAI)
 
-    if llm_source == LLM_SOURCE_HA_OPENAI and not hass.config_entries.async_entries(
-        OPENAI_INTEGRATION_DOMAIN
+    if llm_source == LLM_SOURCE_HA_OPENAI and not any(
+        hass.config_entries.async_entries(domain)
+        for domain in OPENAI_INTEGRATION_DOMAINS
     ):
         return False
 

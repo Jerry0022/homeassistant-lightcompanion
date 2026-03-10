@@ -17,7 +17,7 @@ from .const import (
     DEFAULT_PROVIDER,
     DOMAIN,
     LLM_SOURCE_HA_OPENAI,
-    OPENAI_INTEGRATION_DOMAIN,
+    OPENAI_INTEGRATION_DOMAINS,
     PROVIDER_MODELS,
 )
 
@@ -43,7 +43,10 @@ class LightCompanionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         await self.async_set_unique_id(DOMAIN)
         self._abort_if_unique_id_configured()
 
-        if not self.hass.config_entries.async_entries(OPENAI_INTEGRATION_DOMAIN):
+        if not any(
+            self.hass.config_entries.async_entries(domain)
+            for domain in OPENAI_INTEGRATION_DOMAINS
+        ):
             return self.async_abort(reason="missing_openai")
 
         return self.async_create_entry(
