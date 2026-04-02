@@ -28,7 +28,7 @@ async def async_register_panel(hass: HomeAssistant) -> None:
         ]
     )
 
-    panel_custom.async_register_panel(
+    await panel_custom.async_register_panel(
         hass,
         webcomponent_name=PANEL_COMPONENT_NAME,
         frontend_url_path=PANEL_URL_PATH,
@@ -42,4 +42,4 @@ async def async_register_panel(hass: HomeAssistant) -> None:
 
 async def async_unregister_panel(hass: HomeAssistant) -> None:
     """Unregister custom sidebar panel."""
-    panel_custom.async_unregister_panel(hass, PANEL_URL_PATH)
+    await panel_custom.async_unregister_panel(hass, PANEL_URL_PATH)
