@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 import voluptuous as vol
@@ -77,6 +78,8 @@ def _build_prompt(user_text: str, entities: list[dict[str, Any]]) -> str:
     return (
         "You are a Home Assistant light control planner. "
         "Interpret user intent and produce only JSON. "
+        "Return ONLY a JSON object. Do NOT wrap it in markdown code blocks. "
+        "Do NOT add any text before or after the JSON. "
         "JSON schema hint: "
         f"{json.dumps(JSON_SCHEMA_HINT)}\n"
         "Use only entity_ids from this list and valid light service fields. "
@@ -118,8 +121,36 @@ async def _call_provider(hass: HomeAssistant, config: dict[str, Any], prompt: st
     raise ValueError("Unsupported LLM source")
 
 
+def _extract_json(raw: str) -> str:
+    """Extract a JSON object string from raw LLM output.
+
+    Handles three cases in order:
+    1. Content wrapped in ```json ... ``` or ``` ... ``` code fences.
+    2. Bare JSON that may have leading/trailing prose — locate the first ``{``
+       and the last ``}`` and use that substring.
+    3. Return the stripped string as-is so json.loads() can raise a meaningful
+       error if none of the above produced valid JSON.
+    """
+    text = raw.strip()
+
+    # Case 1: markdown code fence (```json ... ``` or ``` ... ```)
+    fence_match = re.search(r"```(?:json)?\s*([\s\S]*?)```", text)
+    if fence_match:
+        return fence_match.group(1).strip()
+
+    # Case 2: find first '{' and last '}' to isolate the JSON object
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        return text[start : end + 1]
+
+    # Case 3: return as-is and let json.loads() surface the error
+    return text
+
+
 def _parse_actions(raw: str) -> dict[str, Any]:
-    parsed = json.loads(raw)
+    cleaned = _extract_json(raw)
+    parsed = json.loads(cleaned)
     if not isinstance(parsed, dict):
         raise ValueError("LLM response must be a JSON object")
 
