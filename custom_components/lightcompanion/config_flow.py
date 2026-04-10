@@ -4,10 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant import config_entries
-from homeassistant.helpers import selector
-
 import voluptuous as vol
+from ha_customapps.config_helpers import model_selector
+from homeassistant import config_entries
 
 from .const import (
     CONF_LLM_SOURCE,
@@ -20,17 +19,6 @@ from .const import (
     OPENAI_INTEGRATION_DOMAINS,
     PROVIDER_MODELS,
 )
-
-
-def _model_selector(provider: str) -> selector.SelectSelector:
-    """Build a model selector for selected provider."""
-    return selector.SelectSelector(
-        selector.SelectSelectorConfig(
-            options=PROVIDER_MODELS.get(provider, []),
-            custom_value=True,
-            mode=selector.SelectSelectorMode.DROPDOWN,
-        )
-    )
 
 
 class LightCompanionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -79,9 +67,9 @@ class LightCompanionOptionsFlow(config_entries.OptionsFlow):
         provider = data.get(CONF_PROVIDER, DEFAULT_PROVIDER)
         schema = vol.Schema(
             {
-                vol.Required(CONF_MODEL, default=data.get(CONF_MODEL, DEFAULT_MODEL)): _model_selector(
-                    provider
-                ),
+                vol.Required(
+                    CONF_MODEL, default=data.get(CONF_MODEL, DEFAULT_MODEL)
+                ): model_selector(PROVIDER_MODELS.get(provider, [])),
             }
         )
 
