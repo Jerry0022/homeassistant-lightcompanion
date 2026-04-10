@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from homeassistant.components import panel_custom
-from homeassistant.components.http import StaticPathConfig
 from homeassistant.core import HomeAssistant
+
+from ha_customapps.panel import PanelRegistrar
 
 from .const import (
     DOMAIN,
@@ -18,26 +19,17 @@ from .const import (
 
 async def async_register_panel(hass: HomeAssistant) -> None:
     """Register custom sidebar panel."""
-    await hass.http.async_register_static_paths(
-        [
-            StaticPathConfig(
-                "/api/lightcompanion/static",
-                hass.config.path("custom_components", DOMAIN, "frontend"),
-                True,
-            )
-        ]
-    )
-
-    await panel_custom.async_register_panel(
+    registrar = PanelRegistrar(
         hass,
-        webcomponent_name=PANEL_COMPONENT_NAME,
-        frontend_url_path=PANEL_URL_PATH,
+        DOMAIN,
+        panel_component=PANEL_COMPONENT_NAME,
+        panel_title=PANEL_TITLE,
+        panel_icon=PANEL_ICON,
+        panel_url_path=PANEL_URL_PATH,
         module_url=PANEL_MODULE_PATH,
-        sidebar_title=PANEL_TITLE,
-        sidebar_icon=PANEL_ICON,
-        require_admin=False,
-        config={"domain": DOMAIN},
+        frontend_dir=hass.config.path("custom_components", DOMAIN, "frontend"),
     )
+    await registrar.async_register()
 
 
 async def async_unregister_panel(hass: HomeAssistant) -> None:

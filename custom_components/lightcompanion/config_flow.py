@@ -5,9 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant import config_entries
-from homeassistant.helpers import selector
 
 import voluptuous as vol
+
+from ha_customapps.config_helpers import model_selector
 
 from .const import (
     CONF_LLM_SOURCE,
@@ -17,20 +18,9 @@ from .const import (
     DEFAULT_PROVIDER,
     DOMAIN,
     LLM_SOURCE_HA_OPENAI,
-    OPENAI_INTEGRATION_DOMAINS,
+    OPENAI_AGENT_DOMAINS,
     PROVIDER_MODELS,
 )
-
-
-def _model_selector(provider: str) -> selector.SelectSelector:
-    """Build a model selector for selected provider."""
-    return selector.SelectSelector(
-        selector.SelectSelectorConfig(
-            options=PROVIDER_MODELS.get(provider, []),
-            custom_value=True,
-            mode=selector.SelectSelectorMode.DROPDOWN,
-        )
-    )
 
 
 class LightCompanionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -45,7 +35,7 @@ class LightCompanionConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if not any(
             self.hass.config_entries.async_entries(domain)
-            for domain in OPENAI_INTEGRATION_DOMAINS
+            for domain in OPENAI_AGENT_DOMAINS
         ):
             return self.async_abort(reason="missing_openai")
 
@@ -79,9 +69,9 @@ class LightCompanionOptionsFlow(config_entries.OptionsFlow):
         provider = data.get(CONF_PROVIDER, DEFAULT_PROVIDER)
         schema = vol.Schema(
             {
-                vol.Required(CONF_MODEL, default=data.get(CONF_MODEL, DEFAULT_MODEL)): _model_selector(
-                    provider
-                ),
+                vol.Required(
+                    CONF_MODEL, default=data.get(CONF_MODEL, DEFAULT_MODEL)
+                ): model_selector(PROVIDER_MODELS.get(provider, [])),
             }
         )
 

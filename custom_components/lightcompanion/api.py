@@ -10,6 +10,10 @@ from homeassistant.components.http import HomeAssistantView
 from homeassistant.core import HomeAssistant, State
 from homeassistant.helpers import area_registry as ar, entity_registry as er
 
+from ha_customapps.config_helpers import get_merged_config, get_primary_entry
+from ha_customapps.entity_utils import serialize_entity_base
+from ha_customapps.llm import call_ha_conversation_agent, parse_llm_json
+
 from .const import (
     API_ENTITIES_PATH,
     API_OPTIONS_PATH,
@@ -23,54 +27,41 @@ from .const import (
     DOMAIN,
     JSON_SCHEMA_HINT,
     LLM_SOURCE_HA_OPENAI,
-    OPENAI_INTEGRATION_DOMAINS,
+    OPENAI_AGENT_DOMAINS,
     PROVIDER_MODELS,
 )
 
 PROCESS_SCHEMA = vol.Schema({vol.Required("text"): str})
 OPTIONS_SCHEMA = vol.Schema({vol.Required(CONF_MODEL): str})
 
-
-def _primary_entry(hass: HomeAssistant):
-    entries = list(hass.config_entries.async_entries(DOMAIN))
-    if not entries:
-        raise ValueError("No Light Companion configuration found")
-    return entries[0]
+_CONFIG_DEFAULTS = {
+    CONF_LLM_SOURCE: LLM_SOURCE_HA_OPENAI,
+    CONF_PROVIDER: DEFAULT_PROVIDER,
+    CONF_MODEL: DEFAULT_MODEL,
+}
 
 
 def _active_config(hass: HomeAssistant) -> dict[str, Any]:
-    entry = _primary_entry(hass)
-    config = {**entry.data, **entry.options}
-    return {
-        CONF_LLM_SOURCE: config.get(CONF_LLM_SOURCE, LLM_SOURCE_HA_OPENAI),
-        CONF_PROVIDER: config.get(CONF_PROVIDER, DEFAULT_PROVIDER),
-        CONF_MODEL: config.get(CONF_MODEL, DEFAULT_MODEL),
-    }
+    entry = get_primary_entry(hass, DOMAIN)
+    return get_merged_config(entry, defaults=_CONFIG_DEFAULTS)
 
 
 def _serialize_light_entity(
     state: State, entity_reg: er.EntityRegistry, area_reg: ar.AreaRegistry
 ) -> dict[str, Any]:
+    base = serialize_entity_base(state, entity_reg, area_reg)
     attrs = state.attributes
-    entry = entity_reg.async_get(state.entity_id)
-    area_name = "unknown"
-    if entry and entry.area_id:
-        area_entry = area_reg.async_get_area(entry.area_id)
-        if area_entry:
-            area_name = area_entry.name
-
-    return {
-        "entity_id": state.entity_id,
-        "name": attrs.get("friendly_name", state.name),
-        "area": area_name,
-        "state": state.state,
-        "supported_color_modes": attrs.get("supported_color_modes", []),
-        "brightness": attrs.get("brightness"),
-        "color_mode": attrs.get("color_mode"),
-        "min_color_temp_kelvin": attrs.get("min_color_temp_kelvin"),
-        "max_color_temp_kelvin": attrs.get("max_color_temp_kelvin"),
-        "effect_list": attrs.get("effect_list", []),
-    }
+    base.update(
+        {
+            "supported_color_modes": attrs.get("supported_color_modes", []),
+            "brightness": attrs.get("brightness"),
+            "color_mode": attrs.get("color_mode"),
+            "min_color_temp_kelvin": attrs.get("min_color_temp_kelvin"),
+            "max_color_temp_kelvin": attrs.get("max_color_temp_kelvin"),
+            "effect_list": attrs.get("effect_list", []),
+        }
+    )
+    return base
 
 
 def _build_prompt(user_text: str, entities: list[dict[str, Any]]) -> str:
@@ -86,48 +77,10 @@ def _build_prompt(user_text: str, entities: list[dict[str, Any]]) -> str:
     )
 
 
-async def _call_ha_openai(hass: HomeAssistant, prompt: str) -> str:
-    openai_entries = []
-    for domain in OPENAI_INTEGRATION_DOMAINS:
-        openai_entries.extend(hass.config_entries.async_entries(domain))
-
-    if not openai_entries:
-        raise ValueError("Home Assistant OpenAI integration is not configured")
-
-    response = await hass.services.async_call(
-        "conversation",
-        "process",
-        {
-            "agent_id": openai_entries[0].entry_id,
-            "text": prompt,
-        },
-        blocking=True,
-        return_response=True,
-    )
-
-    speech = response.get("response", {}).get("speech", {}).get("plain", {}).get("speech")
-    if not speech:
-        raise ValueError("No response returned by Home Assistant OpenAI conversation agent")
-    return speech
-
-
 async def _call_provider(hass: HomeAssistant, config: dict[str, Any], prompt: str) -> str:
     if config[CONF_LLM_SOURCE] == LLM_SOURCE_HA_OPENAI:
-        return await _call_ha_openai(hass, prompt)
-
+        return await call_ha_conversation_agent(hass, prompt, OPENAI_AGENT_DOMAINS)
     raise ValueError("Unsupported LLM source")
-
-
-def _parse_actions(raw: str) -> dict[str, Any]:
-    parsed = json.loads(raw)
-    if not isinstance(parsed, dict):
-        raise ValueError("LLM response must be a JSON object")
-
-    actions = parsed.get("actions", [])
-    if not isinstance(actions, list):
-        raise ValueError("actions must be a list")
-
-    return parsed
 
 
 async def _execute_actions(hass: HomeAssistant, actions: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -194,7 +147,7 @@ class LightCompanionOptionsView(HomeAssistantView):
     async def post(self, request):
         hass: HomeAssistant = request.app["hass"]
         body = OPTIONS_SCHEMA(await request.json())
-        entry = _primary_entry(hass)
+        entry = get_primary_entry(hass, DOMAIN)
 
         options = {**entry.options, CONF_MODEL: body[CONF_MODEL]}
         hass.config_entries.async_update_entry(entry, options=options)
@@ -221,7 +174,7 @@ class LightCompanionStatusView(HomeAssistantView):
         hass: HomeAssistant = request.app["hass"]
         available_domains = {entry.domain for entry in hass.config_entries.async_entries()}
         has_openai_integration = bool(
-            set(OPENAI_INTEGRATION_DOMAINS).intersection(available_domains)
+            set(OPENAI_AGENT_DOMAINS).intersection(available_domains)
         )
         return self.json({"openai_integration_available": has_openai_integration})
 
@@ -249,7 +202,7 @@ class LightCompanionProcessView(HomeAssistantView):
         raw = await _call_provider(hass, config, prompt)
 
         try:
-            parsed = _parse_actions(raw)
+            parsed = parse_llm_json(raw)
         except (json.JSONDecodeError, ValueError) as err:
             return self.json(
                 {
