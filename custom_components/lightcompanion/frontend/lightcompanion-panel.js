@@ -281,18 +281,16 @@ class LightCompanionPanel extends HTMLElement {
 
     if (!this._rendered) {
       this.render();
+      // Defer data loading until after render() has written the shadow DOM,
+      // so that DOM-querying helpers (_updateModelSelector, _addMessage, etc.)
+      // always find their elements.
+      Promise.resolve().then(() => {
+        this._loadStatus();
+        this._loadEntities();
+        this._loadOptions();
+      });
     } else if (langChanged) {
       this._updateStaticText();
-    }
-
-    if (!this._statusLoaded) {
-      this._loadStatus();
-    }
-    if (this._entities.length === 0) {
-      this._loadEntities();
-    }
-    if (this._availableModels.length === 0) {
-      this._loadOptions();
     }
   }
 
@@ -334,6 +332,9 @@ class LightCompanionPanel extends HTMLElement {
       const response = await this._hass.callApi("GET", "lightcompanion/entities");
       this._entities = response.entities || [];
       this._updateStatus();
+      // Show a welcome/ready message in the chat body so the user knows
+      // the integration is active and how many entities were found.
+      this._addMessage({ type: "system", text: t.readyLoaded(this._entities.length) });
     } catch (err) {
       this._addMessage({ type: "error", text: t.loadError(err.message) });
     }
@@ -659,7 +660,11 @@ class LightCompanionPanel extends HTMLElement {
           display: flex;
           flex-direction: column;
           align-items: center;
-          min-height: 100vh;
+          /* Use 100% so we fill only the space the HA shell allocates to the
+             panel (the shell already subtracts its 64px toolbar). Avoid
+             min-height/100vh which causes overflow inside the HA app frame. */
+          height: 100%;
+          overflow: hidden;
           padding: 16px;
           background: var(--primary-background-color, #111318);
           color: var(--primary-text-color, #e1e2e8);
@@ -672,7 +677,10 @@ class LightCompanionPanel extends HTMLElement {
           display: flex;
           flex-direction: column;
           gap: 0;
-          height: calc(100vh - 32px);
+          /* Fill the host's allocated height (100%) minus host's own padding
+             (16px top + 16px bottom = 32px). This makes the flex children
+             correctly fill the available panel area. */
+          height: calc(100% - 32px);
         }
 
         /* ── Header card ── */
@@ -1028,7 +1036,8 @@ class LightCompanionPanel extends HTMLElement {
         /* ── Responsive ── */
         @media (max-width: 480px) {
           :host { padding: 8px; }
-          .panel-wrap { height: calc(100vh - 16px); }
+          /* On mobile the host padding shrinks to 8px × 2 = 16px total */
+          .panel-wrap { height: calc(100% - 16px); }
           .bubble { max-width: 92%; }
           .voice-hint { display: none; }
           .header-card, .input-card { padding: 12px 14px; }
