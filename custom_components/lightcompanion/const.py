@@ -23,6 +23,21 @@ PLATFORMS: list[str] = []
 LLM_SOURCE_HA_OPENAI = LLM_SOURCE_HA_CONVERSATION
 OPENAI_INTEGRATION_DOMAINS = OPENAI_AGENT_DOMAINS
 
+# Provider → HA integration domain mapping (all supported conversation agents)
+PROVIDER_AGENT_DOMAINS: dict[str, tuple[str, ...]] = {
+    "openai": ("openai_conversation", "openai"),
+    "google": ("google_generative_ai_conversation",),
+    "anthropic": ("anthropic",),
+    "ollama": ("ollama",),
+}
+
+# Flat tuple of every supported domain — used for "is any LLM available?" checks
+ALL_AGENT_DOMAINS: tuple[str, ...] = tuple(
+    domain
+    for domains in PROVIDER_AGENT_DOMAINS.values()
+    for domain in domains
+)
+
 PANEL_URL_PATH = "lightcompanion"
 PANEL_TITLE = "Light Companion"
 PANEL_ICON = "mdi:message-processing-outline"

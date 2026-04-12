@@ -3,18 +3,16 @@
     "step": {
       "user": {
         "title": "Light Companion",
-        "description": "Configura il tuo provider LLM.",
-        "data": {
-          "provider": "Provider",
-          "api_key": "Chiave API",
-          "model": "Modello",
-          "base_url": "URL di base"
-        }
+        "description": "Light Companion utilizza qualsiasi agente di conversazione Home Assistant supportato (OpenAI, Anthropic, Google, Ollama) per l'accesso LLM."
       }
+    },
+    "abort": {
+      "missing_llm": "Nessuna integrazione di agente di conversazione supportata trovata. Configura almeno una (OpenAI Conversation, Anthropic, Google Generative AI o Ollama) in Impostazioni > Dispositivi e servizi, quindi riprova.",
+      "missing_openai": "Nessuna integrazione di agente di conversazione supportata trovata."
     }
   },
   "panel": {
-    "openai_missing": "OpenAI integration is missing.",
-    "open_integrations_cta": "Open Integrations"
+    "openai_missing": "Nessuna integrazione LLM disponibile.",
+    "open_integrations_cta": "Apri integrazioni"
   }
 }

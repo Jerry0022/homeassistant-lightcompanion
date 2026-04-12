@@ -14,8 +14,9 @@ const UI_TEXT = {
     modelSaving: "Saving model…",
     modelSaved: (model) => `Model switched to ${model}.`,
     modelSaveFailed: (message) => `Failed to save model: ${message}`,
-    openAiMissing: "OpenAI integration is missing.",
+    openAiMissing: "No AI integration found. Add a conversation agent in Integrations.",
     openIntegrationsCta: "Open Integrations",
+    provider: "Provider",
     entitiesLoaded: (count) => `${count} entities`,
     processing: "Processing…",
     errorPrefix: "Error",
@@ -38,8 +39,9 @@ const UI_TEXT = {
     modelSaving: "Modell wird gespeichert…",
     modelSaved: (model) => `Modell gewechselt zu ${model}.`,
     modelSaveFailed: (message) => `Modell speichern fehlgeschlagen: ${message}`,
-    openAiMissing: "OpenAI-Integration fehlt.",
+    openAiMissing: "Keine KI-Integration gefunden. Füge einen Conversation Agent unter Integrationen hinzu.",
     openIntegrationsCta: "Integrationen öffnen",
+    provider: "Anbieter",
     entitiesLoaded: (count) => `${count} Entitäten`,
     processing: "Verarbeitung…",
     errorPrefix: "Fehler",
@@ -62,8 +64,9 @@ const UI_TEXT = {
     modelSaving: "Enregistrement du modèle…",
     modelSaved: (model) => `Modèle changé en ${model}.`,
     modelSaveFailed: (message) => `Échec de l'enregistrement du modèle : ${message}`,
-    openAiMissing: "L'intégration OpenAI est manquante.",
+    openAiMissing: "Aucune intégration IA trouvée. Ajoutez un agent de conversation dans les intégrations.",
     openIntegrationsCta: "Ouvrir les intégrations",
+    provider: "Fournisseur",
     entitiesLoaded: (count) => `${count} entités`,
     processing: "Traitement…",
     errorPrefix: "Erreur",
@@ -86,8 +89,9 @@ const UI_TEXT = {
     modelSaving: "Guardando modelo…",
     modelSaved: (model) => `Modelo cambiado a ${model}.`,
     modelSaveFailed: (message) => `Error al guardar el modelo: ${message}`,
-    openAiMissing: "Falta la integración de OpenAI.",
+    openAiMissing: "No se encontró integración de IA. Agrega un agente de conversación en Integraciones.",
     openIntegrationsCta: "Abrir integraciones",
+    provider: "Proveedor",
     entitiesLoaded: (count) => `${count} entidades`,
     processing: "Procesando…",
     errorPrefix: "Error",
@@ -110,8 +114,9 @@ const UI_TEXT = {
     modelSaving: "Salvataggio modello…",
     modelSaved: (model) => `Modello cambiato in ${model}.`,
     modelSaveFailed: (message) => `Salvataggio modello fallito: ${message}`,
-    openAiMissing: "Integrazione OpenAI mancante.",
+    openAiMissing: "Nessuna integrazione IA trovata. Aggiungi un agente di conversazione nelle integrazioni.",
     openIntegrationsCta: "Apri integrazioni",
+    provider: "Fornitore",
     entitiesLoaded: (count) => `${count} entità`,
     processing: "Elaborazione…",
     errorPrefix: "Errore",
@@ -134,8 +139,9 @@ const UI_TEXT = {
     modelSaving: "Salvando modelo…",
     modelSaved: (model) => `Modelo alterado para ${model}.`,
     modelSaveFailed: (message) => `Falha ao salvar o modelo: ${message}`,
-    openAiMissing: "Integração OpenAI ausente.",
+    openAiMissing: "Nenhuma integração de IA encontrada. Adicione um agente de conversa nas Integrações.",
     openIntegrationsCta: "Abrir integrações",
+    provider: "Provedor",
     entitiesLoaded: (count) => `${count} entidades`,
     processing: "Processando…",
     errorPrefix: "Erro",
@@ -158,8 +164,9 @@ const UI_TEXT = {
     modelSaving: "Model opslaan…",
     modelSaved: (model) => `Model gewijzigd naar ${model}.`,
     modelSaveFailed: (message) => `Model opslaan mislukt: ${message}`,
-    openAiMissing: "OpenAI-integratie ontbreekt.",
+    openAiMissing: "Geen AI-integratie gevonden. Voeg een gespreksagent toe in Integraties.",
     openIntegrationsCta: "Integraties openen",
+    provider: "Provider",
     entitiesLoaded: (count) => `${count} entiteiten`,
     processing: "Verwerking…",
     errorPrefix: "Fout",
@@ -182,8 +189,9 @@ const UI_TEXT = {
     modelSaving: "Zapisywanie modelu…",
     modelSaved: (model) => `Model zmieniony na ${model}.`,
     modelSaveFailed: (message) => `Zapisywanie modelu nie powiodło się: ${message}`,
-    openAiMissing: "Brak integracji OpenAI.",
+    openAiMissing: "Nie znaleziono integracji AI. Dodaj agenta konwersacyjnego w Integracjach.",
     openIntegrationsCta: "Otwórz integracje",
+    provider: "Dostawca",
     entitiesLoaded: (count) => `${count} encji`,
     processing: "Przetwarzanie…",
     errorPrefix: "Błąd",
@@ -206,8 +214,9 @@ const UI_TEXT = {
     modelSaving: "モデルを保存中…",
     modelSaved: (model) => `モデルを ${model} に切り替えました。`,
     modelSaveFailed: (message) => `モデルの保存に失敗しました: ${message}`,
-    openAiMissing: "OpenAI 統合がありません。",
+    openAiMissing: "AI統合が見つかりません。統合にConversation Agentを追加してください。",
     openIntegrationsCta: "統合を開く",
+    provider: "プロバイダー",
     entitiesLoaded: (count) => `${count} エンティティ`,
     processing: "処理中…",
     errorPrefix: "エラー",
@@ -230,8 +239,9 @@ const UI_TEXT = {
     modelSaving: "正在保存模型…",
     modelSaved: (model) => `模型已切换到 ${model}。`,
     modelSaveFailed: (message) => `保存模型失败：${message}`,
-    openAiMissing: "缺少 OpenAI 集成。",
+    openAiMissing: "未找到AI集成。请在集成中添加对话代理。",
     openIntegrationsCta: "打开集成",
+    provider: "提供商",
     entitiesLoaded: (count) => `${count} 个实体`,
     processing: "处理中…",
     errorPrefix: "错误",
@@ -267,6 +277,8 @@ class LightCompanionPanel extends HTMLElement {
     this._lang = "en";
     this._model = "";
     this._availableModels = [];
+    this._provider = "";
+    this._availableProviders = [];
     this._openAiIntegrationAvailable = null;
     this._statusLoaded = false;
     this._rendered = false;
@@ -315,12 +327,14 @@ class LightCompanionPanel extends HTMLElement {
   async _loadStatus() {
     try {
       const response = await this._hass.callApi("GET", "lightcompanion/status");
-      this._openAiIntegrationAvailable = !!response.openai_integration_available;
+      // Use new llm_available field, fall back to old openai field for backward compat
+      this._openAiIntegrationAvailable = !!(response.llm_available ?? response.openai_integration_available);
       this._statusLoaded = true;
     } catch (err) {
       this._statusLoaded = true;
       this._openAiIntegrationAvailable = null;
-      this._addMessage({ type: "error", text: `Failed to load status: ${err.message}` });
+      const msg = err?.message || String(err) || "Unknown error";
+      this._addMessage({ type: "error", text: `Failed to load status: ${msg}` });
     }
     this._updateWarning();
     this._updateInput();
@@ -336,15 +350,19 @@ class LightCompanionPanel extends HTMLElement {
       // the integration is active and how many entities were found.
       this._addMessage({ type: "system", text: t.readyLoaded(this._entities.length) });
     } catch (err) {
-      this._addMessage({ type: "error", text: t.loadError(err.message) });
+      const msg = err?.message || String(err) || "Unknown error";
+      this._addMessage({ type: "error", text: t.loadError(msg) });
     }
   }
 
   async _loadOptions() {
     try {
       const response = await this._hass.callApi("GET", "lightcompanion/options");
+      this._provider = response.provider || "";
       this._model = response.model || "";
       this._availableModels = response.available_models || [];
+      this._availableProviders = response.available_providers || [];
+      this._updateProviderSelector();
       this._updateModelSelector();
     } catch (_err) {
       // Options are optional.
@@ -363,7 +381,28 @@ class LightCompanionPanel extends HTMLElement {
       this._addMessage({ type: "system", text: t.modelSaved(this._model) });
       this._updateModelSelector();
     } catch (err) {
-      this._addMessage({ type: "error", text: t.modelSaveFailed(err.message) });
+      const msg = err?.message || String(err) || "Unknown error";
+      this._addMessage({ type: "error", text: t.modelSaveFailed(msg) });
+    }
+  }
+
+  async _changeProvider(nextProvider) {
+    const t = this._t();
+    if (!nextProvider || this._loading || nextProvider === this._provider) return;
+
+    this._addMessage({ type: "system", text: `Switching to ${nextProvider}...` });
+    try {
+      const response = await this._hass.callApi("POST", "lightcompanion/options", { provider: nextProvider });
+      this._provider = response.provider || nextProvider;
+      this._model = response.model || "";
+      this._availableModels = response.available_models || [];
+      this._availableProviders = response.available_providers || this._availableProviders;
+      this._addMessage({ type: "system", text: `Provider: ${this._provider}, Model: ${this._model}` });
+      this._updateProviderSelector();
+      this._updateModelSelector();
+    } catch (err) {
+      const msg = err?.message || String(err) || "Unknown error";
+      this._addMessage({ type: "error", text: msg });
     }
   }
 
@@ -393,7 +432,8 @@ class LightCompanionPanel extends HTMLElement {
       });
     } catch (err) {
       this._removeLoadingBubble(loadingId);
-      this._addMessage({ type: "error", text: t.requestFailed(err.message) });
+      const msg = err?.message || String(err) || "Unknown error";
+      this._addMessage({ type: "error", text: t.requestFailed(msg) });
     } finally {
       this._loading = false;
       this._updateInput();
@@ -528,14 +568,31 @@ class LightCompanionPanel extends HTMLElement {
     }
   }
 
+  _updateProviderSelector() {
+    const providerSelect = this.shadowRoot?.querySelector("#provider");
+    if (!providerSelect) return;
+    const providers = this._availableProviders || [];
+    providerSelect.disabled = providers.length === 0 || this._loading;
+    const current = Array.from(providerSelect.options).map((o) => o.value);
+    const same = current.length === providers.length && providers.every((p, i) => p === current[i]);
+    if (!same) {
+      providerSelect.innerHTML = providers
+        .map((p) => `<option value="${p}"${p === this._provider ? " selected" : ""}>${p}</option>`)
+        .join("");
+    } else {
+      providerSelect.value = this._provider;
+    }
+  }
+
   _updateStaticText() {
     const t = this._t();
     const voiceHint = this.shadowRoot?.querySelector(".voice-hint");
     if (voiceHint) voiceHint.textContent = t.voiceHint;
     this._updateStatus();
     this._updateInput();
-    const modelLabel = this.shadowRoot?.querySelector(".model-label");
-    if (modelLabel) modelLabel.textContent = t.model;
+    const labels = this.shadowRoot?.querySelectorAll(".model-label");
+    if (labels && labels.length >= 1) labels[0].textContent = t.provider;
+    if (labels && labels.length >= 2) labels[1].textContent = t.model;
   }
 
   _scrollToBottom() {
@@ -1067,6 +1124,8 @@ class LightCompanionPanel extends HTMLElement {
             </div>
 
             <div class="model-row">
+              <label class="model-label" for="provider">${t.provider}</label>
+              <select id="provider" class="model-select" disabled aria-label="${t.provider}"></select>
               <label class="model-label" for="model">${t.model}</label>
               <select id="model" class="model-select" disabled aria-label="${t.model}"></select>
             </div>
@@ -1117,6 +1176,7 @@ class LightCompanionPanel extends HTMLElement {
     const input = this.shadowRoot.querySelector("#prompt");
     const sendBtn = this.shadowRoot.querySelector("#send");
     const modelSelect = this.shadowRoot.querySelector("#model");
+    const providerSelect = this.shadowRoot.querySelector("#provider");
 
     input?.addEventListener("input", (ev) => {
       this._text = ev.target.value;
@@ -1129,6 +1189,7 @@ class LightCompanionPanel extends HTMLElement {
     });
     sendBtn?.addEventListener("click", () => this._submit());
     modelSelect?.addEventListener("change", (ev) => this._changeModel(ev.target.value));
+    providerSelect?.addEventListener("change", (ev) => this._changeProvider(ev.target.value));
 
     setTimeout(() => input?.focus(), 0);
   }
