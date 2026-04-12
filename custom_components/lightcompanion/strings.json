@@ -3,15 +3,16 @@
     "step": {
       "user": {
         "title": "Light Companion",
-        "description": "Light Companion uses Home Assistant's OpenAI integration for LLM access."
+        "description": "Light Companion uses any supported Home Assistant conversation agent (OpenAI, Anthropic, Google, Ollama) for LLM access."
       }
     },
     "abort": {
-      "missing_openai": "No configured Home Assistant OpenAI integration was found. Set up the OpenAI Conversation integration first (Settings > Devices & Services > Add Integration > OpenAI Conversation), then retry Light Companion."
+      "missing_llm": "No supported conversation agent integration was found. Set up at least one (OpenAI Conversation, Anthropic, Google Generative AI, or Ollama) under Settings > Devices & Services, then retry Light Companion.",
+      "missing_openai": "No supported conversation agent integration was found."
     }
   },
   "panel": {
-    "openai_missing": "OpenAI integration is missing.",
+    "openai_missing": "No LLM integration is available.",
     "open_integrations_cta": "Open Integrations"
   }
 }

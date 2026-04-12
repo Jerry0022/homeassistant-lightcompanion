@@ -11,10 +11,14 @@
           "base_url": "Basis-URL"
         }
       }
+    },
+    "abort": {
+      "missing_llm": "Es wurde keine unterstützte Konversationsagenten-Integration gefunden. Richte mindestens eine ein (OpenAI Conversation, Anthropic, Google Generative AI oder Ollama) unter Einstellungen > Geräte & Dienste und versuche es erneut.",
+      "missing_openai": "Es wurde keine unterstützte Konversationsagenten-Integration gefunden."
     }
   },
   "panel": {
-    "openai_missing": "OpenAI-Integration fehlt.",
+    "openai_missing": "Keine LLM-Integration verfügbar.",
     "open_integrations_cta": "Integrationen öffnen"
   }
 }

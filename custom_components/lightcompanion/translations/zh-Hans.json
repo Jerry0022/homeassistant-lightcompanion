@@ -14,7 +14,7 @@
     }
   },
   "panel": {
-    "openai_missing": "OpenAI integration is missing.",
-    "open_integrations_cta": "Open Integrations"
+    "openai_missing": "没有可用的 LLM 集成。",
+    "open_integrations_cta": "打开集成"
   }
 }

@@ -14,7 +14,7 @@
     }
   },
   "panel": {
-    "openai_missing": "OpenAI integration is missing.",
-    "open_integrations_cta": "Open Integrations"
+    "openai_missing": "Geen LLM-integratie beschikbaar.",
+    "open_integrations_cta": "Integraties openen"
   }
 }

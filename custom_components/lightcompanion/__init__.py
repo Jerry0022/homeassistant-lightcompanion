@@ -13,10 +13,8 @@ from .api import (
     LightCompanionStatusView,
 )
 from .const import (
-    CONF_LLM_SOURCE,
+    ALL_AGENT_DOMAINS,
     DOMAIN,
-    LLM_SOURCE_HA_OPENAI,
-    OPENAI_INTEGRATION_DOMAINS,
 )
 from .panel import async_register_panel, async_unregister_panel
 
@@ -29,13 +27,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Light Companion from config entry."""
-    merged_config = {**entry.data, **entry.options}
-    llm_source = merged_config.get(CONF_LLM_SOURCE, LLM_SOURCE_HA_OPENAI)
-
-    if llm_source == LLM_SOURCE_HA_OPENAI and not any(
-        hass.config_entries.async_entries(domain)
-        for domain in OPENAI_INTEGRATION_DOMAINS
-    ):
+    available = {e.domain for e in hass.config_entries.async_entries()}
+    if not set(ALL_AGENT_DOMAINS).intersection(available):
         return False
 
     domain_data = hass.data.setdefault(DOMAIN, {})

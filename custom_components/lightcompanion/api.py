@@ -14,6 +14,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import area_registry as ar, entity_registry as er
 
 from .const import (
+    ALL_AGENT_DOMAINS,
     API_ENTITIES_PATH,
     API_OPTIONS_PATH,
     API_PROCESS_PATH,
@@ -25,13 +26,18 @@ from .const import (
     DEFAULT_PROVIDER,
     DOMAIN,
     JSON_SCHEMA_HINT,
-    LLM_SOURCE_HA_OPENAI,
-    OPENAI_INTEGRATION_DOMAINS,
+    LLM_SOURCE_HA_CONVERSATION,
+    PROVIDER_AGENT_DOMAINS,
     PROVIDER_MODELS,
 )
 
 PROCESS_SCHEMA = vol.Schema({vol.Required("text"): str})
-OPTIONS_SCHEMA = vol.Schema({vol.Required(CONF_MODEL): str})
+OPTIONS_SCHEMA = vol.Schema(
+    {
+        vol.Optional(CONF_MODEL): str,
+        vol.Optional(CONF_PROVIDER): str,
+    }
+)
 
 
 def _active_config(hass: HomeAssistant) -> dict[str, Any]:
@@ -39,7 +45,7 @@ def _active_config(hass: HomeAssistant) -> dict[str, Any]:
     config = get_merged_config(
         entry,
         defaults={
-            CONF_LLM_SOURCE: LLM_SOURCE_HA_OPENAI,
+            CONF_LLM_SOURCE: LLM_SOURCE_HA_CONVERSATION,
             CONF_PROVIDER: DEFAULT_PROVIDER,
             CONF_MODEL: DEFAULT_MODEL,
         },
@@ -82,9 +88,11 @@ def _build_prompt(user_text: str, entities: list[dict[str, Any]]) -> str:
 
 
 async def _call_provider(hass: HomeAssistant, config: dict[str, Any], prompt: str) -> str:
-    if config[CONF_LLM_SOURCE] == LLM_SOURCE_HA_OPENAI:
-        return await call_ha_conversation_agent(hass, prompt, OPENAI_INTEGRATION_DOMAINS)
-    raise ValueError("Unsupported LLM source")
+    provider = config[CONF_PROVIDER]
+    domains = PROVIDER_AGENT_DOMAINS.get(provider)
+    if not domains:
+        raise ValueError(f"Unsupported provider: {provider}")
+    return await call_ha_conversation_agent(hass, prompt, domains)
 
 
 async def _execute_actions(hass: HomeAssistant, actions: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -140,11 +148,17 @@ class LightCompanionOptionsView(HomeAssistantView):
         hass: HomeAssistant = request.app["hass"]
         config = _active_config(hass)
         provider = config[CONF_PROVIDER]
+        available = {e.domain for e in hass.config_entries.async_entries()}
+        available_providers = [
+            p for p, domains in PROVIDER_AGENT_DOMAINS.items()
+            if set(domains).intersection(available)
+        ]
         return self.json(
             {
                 CONF_PROVIDER: provider,
                 CONF_MODEL: config[CONF_MODEL],
                 "available_models": PROVIDER_MODELS.get(provider, []),
+                "available_providers": available_providers,
             }
         )
 
@@ -153,16 +167,30 @@ class LightCompanionOptionsView(HomeAssistantView):
         body = OPTIONS_SCHEMA(await request.json())
         entry = get_primary_entry(hass, DOMAIN)
 
-        options = {**entry.options, CONF_MODEL: body[CONF_MODEL]}
+        options = {**entry.options}
+        if CONF_PROVIDER in body:
+            options[CONF_PROVIDER] = body[CONF_PROVIDER]
+            # Reset model to the first available for the new provider
+            models = PROVIDER_MODELS.get(body[CONF_PROVIDER], [])
+            options[CONF_MODEL] = models[0] if models else ""
+        if CONF_MODEL in body:
+            options[CONF_MODEL] = body[CONF_MODEL]
+
         hass.config_entries.async_update_entry(entry, options=options)
 
         config = _active_config(hass)
         provider = config[CONF_PROVIDER]
+        available = {e.domain for e in hass.config_entries.async_entries()}
+        available_providers = [
+            p for p, domains in PROVIDER_AGENT_DOMAINS.items()
+            if set(domains).intersection(available)
+        ]
         return self.json(
             {
                 CONF_PROVIDER: provider,
                 CONF_MODEL: config[CONF_MODEL],
                 "available_models": PROVIDER_MODELS.get(provider, []),
+                "available_providers": available_providers,
             }
         )
 
@@ -176,11 +204,20 @@ class LightCompanionStatusView(HomeAssistantView):
 
     async def get(self, request):
         hass: HomeAssistant = request.app["hass"]
-        available_domains = {entry.domain for entry in hass.config_entries.async_entries()}
-        has_openai_integration = bool(
-            set(OPENAI_INTEGRATION_DOMAINS).intersection(available_domains)
+        available = {e.domain for e in hass.config_entries.async_entries()}
+        has_any = bool(set(ALL_AGENT_DOMAINS).intersection(available))
+        available_providers = [
+            p for p, domains in PROVIDER_AGENT_DOMAINS.items()
+            if set(domains).intersection(available)
+        ]
+        return self.json(
+            {
+                # kept for backward compatibility with existing frontend code
+                "openai_integration_available": has_any,
+                "llm_available": has_any,
+                "available_providers": available_providers,
+            }
         )
-        return self.json({"openai_integration_available": has_openai_integration})
 
 
 class LightCompanionProcessView(HomeAssistantView):
