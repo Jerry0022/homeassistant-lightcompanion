@@ -1,7 +1,4 @@
 {
   "name": "Light Companion",
-  "homeassistant": "2025.1.0",
-  "content_in_root": false,
-  "render_readme": true,
-  "domains": ["lightcompanion"]
+  "render_readme": true
 }
