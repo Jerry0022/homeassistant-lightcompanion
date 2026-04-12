@@ -3,13 +3,7 @@
     "step": {
       "user": {
         "title": "Light Companion",
-        "description": "Konfiguriere deinen LLM-Anbieter.",
-        "data": {
-          "provider": "Anbieter",
-          "api_key": "API-Schlüssel",
-          "model": "Modell",
-          "base_url": "Basis-URL"
-        }
+        "description": "Light Companion nutzt jeden unterstützten Home Assistant Conversation Agent (OpenAI, Anthropic, Google, Ollama) für LLM-Zugriff."
       }
     },
     "abort": {
